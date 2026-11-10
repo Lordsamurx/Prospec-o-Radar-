@@ -1,29 +1,34 @@
 # Publicar as amostras no Cloudflare Pages
 
-As amostras ficam no seu PC (`data/previews`). Para o dono do negócio abrir o link, elas precisam estar na internet.
+As amostras ficam no seu PC (`C:\dev\prospeccao-data\previews` no Docker, ou `data/previews`).
+Para o dono do negócio abrir o link, elas precisam estar na internet.
 O Cloudflare Pages é grátis. Só as amostras saem do PC. O banco e os leads ficam com você.
 
-> Não testado de verdade ainda: falta a sua conta no Cloudflare.
-
 ## Uma vez só
-1. Crie uma conta grátis em https://dash.cloudflare.com/sign-up.
-2. Instale o Node.js LTS em https://nodejs.org (precisa para o comando `npx`).
-3. No terminal, dentro da pasta `v3`, faça login: `npx wrangler login` (abre o navegador).
-4. Crie o projeto: `npx wrangler pages project create amostras-samuel --production-branch main`.
-   Troque `amostras-samuel` por um nome só seu. Ele vira o endereço: `https://amostras-samuel.pages.dev`.
-5. No arquivo `v3/.env`, acrescente:
+1. Conta no Cloudflare: https://dash.cloudflare.com (grátis).
+2. Instale o Node.js LTS em https://nodejs.org. Depois feche e abra o PowerShell.
+3. No PowerShell, dentro da pasta `v3`, faça login (abre o navegador, clique em "Allow"):
+   `npx wrangler login`
+4. Crie o projeto das amostras:
+   `npx wrangler pages project create radar-amostras --production-branch main`
+   O nome vira o endereço. Se `radar-amostras` já existir no Cloudflare, use outro (ex.: `radar-amostras-sv`).
+   O endereço certo aparece no fim do comando e no painel (Workers e Pages).
+5. No arquivo `v3/.env`, acrescente (com o nome e o endereço do passo 4):
    ```
-   CLOUDFLARE_PAGES_PROJECT=amostras-samuel
-   PREVIEWS_PUBLIC_URL=https://amostras-samuel.pages.dev
+   CLOUDFLARE_PAGES_PROJECT=radar-amostras
+   PREVIEWS_PUBLIC_URL=https://radar-amostras.pages.dev
    ```
-6. Reinicie a app.
+6. Reinicie a app: `docker compose up -d --force-recreate`.
 
 ## Sempre que gerar amostras novas
+No Docker (sem Python no Windows):
 ```
-python scripts/dev.py publish
+powershell -ExecutionPolicy Bypass -File scripts\publicar-amostras.ps1
 ```
-O comando põe `noindex` em tudo (nenhuma amostra aparece no Google) e envia a pasta.
+Rodando com Python (sem Docker): `python scripts/dev.py publish`.
+
+Os dois põem `noindex` em tudo (nenhuma amostra aparece no Google) e enviam só a pasta de amostras.
 Depois disso, o link que vai na mensagem já é o público. A tela avisa quando o link ainda é local.
 
 ## Tirar uma amostra do ar
-Exclua o lead (LGPD) ou apague a pasta da amostra em `data/previews` (mova para `_lixeira`) e rode `publish` de novo.
+Exclua o lead (LGPD) ou mova a pasta da amostra para `_lixeira` e publique de novo.
