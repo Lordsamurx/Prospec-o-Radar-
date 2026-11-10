@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Configurações{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Configurações</h1><p>Chaves e senhas ficam só no arquivo .env. Aqui você ajusta o resto.</p></div></div>
+{% if saved %}<p class="banner ok" role="status">{{ {"backup": "Backup feito.", "mock": "Leads fictícios arquivados."}.get(saved, "Salvo.") }}</p>{% endif %}
+{% if db_in_onedrive %}<p class="banner" role="note">O banco de dados está numa pasta do OneDrive. A sincronização pode corromper o arquivo. Mude DATABASE_URL no .env para uma pasta fora do OneDrive, como C:/dev/prospeccao-data/radar.db.</p>{% endif %}
+
+<div class="bento">
+  <section class="card span-3 stack" aria-labelledby="c-src">
+    <h2 id="c-src">Fonte dos dados</h2>
+    <dl class="kv">
+      <dt>Provedor</dt><dd>{{ PROVIDER_LABELS.get(provider, provider) }} <span class="muted">(PLACES_PROVIDER={{ provider }})</span></dd>
+      <dt>Chave do Google</dt><dd>{{ 'preenchida no .env' if has_google_key else 'não preenchida' }}</dd>
+      <dt>Limite por dia</dt><dd>{{ limit }} buscas no Google (usadas hoje: {{ quota.used_today if quota.limited else 0 }})</dd>
+      <dt>Senha da app</dt><dd>{{ 'ligada' if has_password else 'desligada (uso só no seu computador)' }}</dd>
+      <dt>Banco de dados</dt><dd>{{ database }}</dd>
+      <dt>Link das amostras</dt><dd>{{ previews_public_url or base_url }}{% if preview_link_is_local %} <span class="chip atencao">só abre neste computador</span>{% endif %}</dd>
+    </dl>
+    <p class="small muted">Para trocar o provedor, a chave, o limite ou a senha, edite o arquivo .env e reinicie a app. Veja a <a href="/ajuda">Ajuda</a>.</p>
+  </section>
+
+  <section class="card span-3 stack" aria-labelledby="c-seller">
+    <h2 id="c-seller">Seu perfil nas mensagens</h2>
+    <form class="stack sm" method="post" action="/config"><input type="hidden" name="section" value="seller">
+      <div class="form-grid">
+        <div class="field"><label for="se-name">Seu nome</label><input type="text" id="se-name" name="name" value="{{ seller.name }}" required maxlength="60"></div>
+        <div class="field"><label for="se-city">Cidade</label><input type="text" id="se-city" name="city" value="{{ seller.city }}" maxlength="60"></div>
+      </div>
+      <div class="field"><label for="se-what">O que você faz</label><input type="text" id="se-what" name="what" value="{{ seller.what }}" maxlength="200"></div>
+      <div class="field"><label for="se-tone">Tom das mensagens</label><input type="text" id="se-tone" name="tone" value="{{ seller.tone }}" maxlength="200"></div>
+      <div><button class="btn sm primary" type="submit">Salvar perfil</button></div>
+    </form>
+  </section>
+
+  <section class="card span-3 stack" aria-labelledby="c-goal">
+    <h2 id="c-goal">Meta e follow-ups</h2>
+    <form class="stack sm" method="post" action="/config"><input type="hidden" name="section" value="goal">
+      <div class="form-grid">
+        <div class="field"><label for="g-goal">Abordagens por semana</label><input type="number" id="g-goal" name="weekly_goal" min="1" max="200" value="{{ weekly_goal }}"></div>
+        <div class="field"><label for="g-cad">Dias até cada follow-up</label><input type="text" id="g-cad" name="cadence" value="{{ cadence|join(', ') }}" aria-describedby="g-cad-h"></div>
+        <div class="field"><label for="g-val">Validade da proposta (dias)</label><input type="number" id="g-val" name="proposal_validity" min="1" max="90" value="{{ proposal_validity }}"></div>
+      </div>
+      <p class="hint" id="g-cad-h">Exemplo: 3, 5, 7 quer dizer follow-up 3 dias depois, depois 5, depois 7.</p>
+      <div><button class="btn sm primary" type="submit">Salvar</button></div>
+    </form>
+  </section>
+
+  <section class="card span-3 stack" aria-labelledby="c-tg">
+    <h2 id="c-tg">Análise de site e IA</h2>
+    <form class="stack sm" method="post" action="/config"><input type="hidden" name="section" value="toggles">
+      <label class="check"><input type="checkbox" name="site_analysis" value="1" {{ 'checked' if site_analysis }}> Ler a página inicial do site do lead (uma visita, sem seguir links)</label>
+      <label class="check"><input type="checkbox" name="ai_enabled" value="1" {{ 'checked' if ai_enabled }}> Usar IA para deixar a mensagem mais natural</label>
+      <p class="small muted">IA: {% if ai_keys.gemini or ai_keys.groq %}chave {{ 'do Gemini' if ai_keys.gemini }}{{ ' e ' if ai_keys.gemini and ai_keys.groq }}{{ 'do Groq' if ai_keys.groq }} preenchida no .env.{% else %}nenhuma chave no .env ainda. Sem chave, a app usa o texto padrão. Preencha GEMINI_API_KEY ou GROQ_API_KEY.{% endif %}
+        Teste de velocidade (PageSpeed): {{ 'com chave' if pagespeed_key else 'sem chave, usa a cota grátis' }}.</p>
+      <div><button class="btn sm primary" type="submit">Salvar</button></div>
+    </form>
+  </section>
+
+  <section class="card span-3 stack" aria-labelledby="c-lim">
+    <h2 id="c-lim">Limites da nota A por nicho</h2>
+    <p class="small muted">Padrão: nota 4,0 no Google e 15 avaliações. Mude para um nicho quando fizer sentido.</p>
+    <form class="form-grid" method="post" action="/config"><input type="hidden" name="section" value="limits">
+      <div class="field"><label for="l-niche">Nicho</label><select id="l-niche" name="niche" required>
+        {% for sector, niches in cat().by_sector() %}<optgroup label="{{ sector.label }}">{% for n in niches %}<option value="{{ n.key }}">{{ n.label }}</option>{% endfor %}</optgroup>{% endfor %}</select></div>
+      <div class="field"><label for="l-r">Nota mínima</label><input type="text" inputmode="decimal" id="l-r" name="min_rating" placeholder="4,0"></div>
+      <div class="field"><label for="l-n">Avaliações mínimas</label><input type="number" id="l-n" name="min_reviews" min="0" placeholder="15"></div>
+      <button class="btn sm primary" type="submit">Salvar limite</button>
+    </form>
+    {% if niche_limits %}<ul class="stack sm small">{% for k, v in niche_limits.items() %}<li class="row between"><span>{{ cat().label(k) }}: nota {{ ('%g'|format(v.min_rating))|replace('.', ',') }} e {{ v.min_reviews }} avaliações</span>
+      <form method="post" action="/config"><input type="hidden" name="section" value="limits"><input type="hidden" name="niche" value="{{ k }}"><input type="hidden" name="reset" value="1"><button class="btn sm ghost" type="submit" aria-label="Voltar {{ cat().label(k) }} ao padrão">Voltar ao padrão</button></form></li>{% endfor %}</ul>{% endif %}
+  </section>
+
+  <section class="card span-3 stack" aria-labelledby="c-fr">
+    <h2 id="c-fr">Franquias e redes</h2>
+    <form class="stack sm" method="post" action="/config"><input type="hidden" name="section" value="franchises">
+      <label for="fr-list">Um nome por linha. Negócio com um desses nomes cai de nota.</label>
+      <textarea id="fr-list" name="franchises" rows="6">{{ franchises|join('\n') }}</textarea>
+      <div><button class="btn sm primary" type="submit">Salvar lista</button></div>
+    </form>
+  </section>
+
+  <section class="card span-3 stack" aria-labelledby="c-pl">
+    <h2 id="c-pl">Plataformas extras</h2>
+    <form class="stack sm" method="post" action="/config"><input type="hidden" name="section" value="platforms">
+      <label for="pl-list">Endereços que contam como “página de plataforma”, um por linha, no formato dominio.com.br = Nome</label>
+      <textarea id="pl-list" name="platforms" rows="4" placeholder="meuapp.com.br = Meu App">{% for k, v in extra_platforms.items() %}{{ k }} = {{ v }}
+{% endfor %}</textarea>
+      <div><button class="btn sm primary" type="submit">Salvar plataformas</button></div>
+    </form>
+  </section>
+
+  <section class="card span-3 stack" id="backup" aria-labelledby="c-bk">
+    <h2 id="c-bk">Backup e exportação</h2>
+    <p class="small muted">A app copia o banco sozinha ao abrir (guarda os 7 últimos). Você também pode copiar agora.</p>
+    <div class="row"><form method="post" action="/config/backup"><button class="btn sm primary" type="submit">Fazer backup agora</button></form>
+      <a class="btn sm" href="/export.csv">Exportar tudo em CSV</a></div>
+    {% if backups %}<ul class="stack sm small">{% for b in backups %}<li class="row between"><span>{{ b.at|dt }} · {{ b.kind }} · {{ b.size_kb }} KB</span><a href="/config/backup/{{ b.name }}">Baixar</a></li>{% endfor %}</ul>
+    {% else %}<p class="small muted">Nenhum backup ainda.</p>{% endif %}
+  </section>
+
+  <section class="card span-3 stack" id="ficticios" aria-labelledby="c-mk">
+    <h2 id="c-mk">Dados fictícios e privacidade</h2>
+    <p class="small">{{ mock_count }} lead(s) fictício(s) de teste no banco. {{ deletions }} lead(s) excluído(s) de vez a pedido.</p>
+    {% if mock_count %}<form method="post" action="/config/arquivar-ficticios"><button class="btn sm" type="submit">Arquivar os fictícios</button></form>
+    <p class="xs muted">Arquivar esconde de todas as telas. Para ver de novo, marque “Mostrar arquivados” nos filtros.</p>{% endif %}
+  </section>
+</div>
+{% endblock %}

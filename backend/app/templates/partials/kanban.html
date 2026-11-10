@@ -1,0 +1,17 @@
+{% from "_macros.html" import icon %}
+<div class="kanban" role="list" aria-label="Quadro do funil">
+  {% for s in STATUSES %}{% set rows = by_status.get(s, []) %}
+  <section class="kcol" role="listitem" data-status="{{ s }}" data-label="{{ STATUS_LABELS[s] }}" data-default="{{ '1' if s in collapsed_default else '0' }}" aria-labelledby="kh-{{ s }}">
+    <div class="khead">
+      <h3 id="kh-{{ s }}" class="grow">{{ STATUS_LABELS[s] }}</h3><span class="kcount">{{ rows|length }}<span class="sr-only"> leads</span></span>
+      <button type="button" class="icon-btn" style="width:32px;height:32px" data-kcol-toggle aria-expanded="true" aria-label="Recolher a coluna {{ STATUS_LABELS[s] }}">{{ icon("back") }}</button>
+    </div>
+    {% if values.get(s) %}<p class="kval">{{ values[s]|money }} em valor</p>{% endif %}
+    <ul class="kcards">
+      {% for lead in rows[:60] %}{% include "partials/kanban_card.html" %}{% endfor %}
+      {% if rows|length > 60 %}<li class="xs muted">Mais {{ rows|length - 60 }}. <a href="/leads?status={{ s }}">Ver na lista</a></li>{% endif %}
+      {% if not rows %}<li class="xs muted" style="padding: var(--s-2)">Vazio</li>{% endif %}
+    </ul>
+  </section>
+  {% endfor %}
+</div>

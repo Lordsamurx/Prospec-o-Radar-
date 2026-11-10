@@ -1,0 +1,11 @@
+{% if error %}<p class="banner danger" role="alert">{{ error }}</p>
+{% else %}
+<div class="rec principal" role="status">
+  <p><b>{{ r.total }} negócio{{ '' if r.total == 1 else 's' }} de {{ niche_label }}</b>{% if r.cached %} <span class="chip">do cache, sem gastar busca</span>{% endif %}</p>
+  <p class="why">{{ r.created }} novo{{ '' if r.created == 1 else 's' }}, {{ r.updated }} atualizado{{ '' if r.updated == 1 else 's' }}.
+    {% if r.provider == "google" %}Usou {{ r.requests_made }} busca(s) do limite de hoje.{% elif r.provider == "osm" %}Fonte OpenStreetMap: confira nota e avaliações no Maps.{% else %}Dados fictícios.{% endif %}</p>
+  {% if r.total == 0 %}<p class="small">Nada achado. Tente um raio maior, outro bairro ou outra palavra.</p>{% endif %}
+  <div class="row"><a class="btn sm primary" href="/leads?niche={{ r.niche_key }}{{ '&show_mock=1' if r.provider == 'mock' }}">Ver estes leads</a></div>
+  {% if r.attribution %}<p class="xs muted">{{ r.attribution }}</p>{% endif %}
+</div>
+{% endif %}

@@ -1,0 +1,93 @@
+{% extends "base.html" %}{% from "_macros.html" import icon, mini, radar %}
+{% block title %}Hoje{% endblock %}
+{% block content %}
+{% if total == 0 %}
+<section class="card pad-lg empty hero">
+  {{ radar() }}
+  <h1>Seu radar ainda está vazio</h1>
+  <p>Comece com uma busca: escolha um tipo de negócio e um bairro. A app dá nota, mostra o que falta e sugere o que vender.</p>
+  <div class="row"><a class="btn primary" href="/buscas">{{ icon("buscas") }} Fazer a primeira busca</a>
+  <a class="btn" href="/ajuda">Como funciona</a></div>
+</section>
+{% else %}
+<div class="bento">
+  <section class="card pad-lg hero span-4 stack" aria-labelledby="h-next">
+    <p class="eyebrow">Próximo passo</p>
+    <h1 id="h-next">{{ next_step[1] }}</h1>
+    <div class="row">
+      {% if next_step[0] == "search" %}<a class="btn primary" href="/buscas">{{ icon("buscas") }} {{ next_step[2] }}</a>
+      {% else %}<a class="btn primary" href="/sessao">{{ icon("play") }} {{ next_step[2] }}</a>{% endif %}
+      <a class="btn ghost" href="/leads">Ver todos os leads</a>
+    </div>
+  </section>
+  <section class="card pad-lg span-2 stack sm" aria-labelledby="h-goal">
+    <p class="eyebrow" id="h-goal">Meta da semana</p>
+    <p class="stat"><span data-count="{{ week_done }}">{{ week_done }}</span> <small>de {{ week_goal }} abordagens</small></p>
+    <div class="meter" role="img" aria-label="{{ week_done }} de {{ week_goal }} abordagens feitas"><i style="--v: {{ [100, (100 * week_done / week_goal)|round|int]|min if week_goal else 0 }}%"></i></div>
+    <p class="small muted">{% if week_done >= week_goal %}Meta batida. Boa!{% else %}Faltam {{ week_goal - week_done }} até domingo.{% endif %}</p>
+  </section>
+
+  <section class="card span-3" aria-labelledby="h-fu">
+    <div class="card-head"><h2 id="h-fu">Follow-ups de hoje</h2><span class="kcount">{{ followups|length }}</span></div>
+    {% if followups %}<ul class="mini-list">{% for l in followups[:6] %}{{ mini(l, l.next_action) }}{% endfor %}</ul>
+    {% if followups|length > 6 %}<a class="small" href="/leads?overdue=1&amp;status=ABORDADO&amp;status=FOLLOWUP">Ver os {{ followups|length }}</a>{% endif %}
+    {% else %}<p class="muted small">Nenhum follow-up para hoje.</p>{% endif %}
+  </section>
+  <section class="card span-3" aria-labelledby="h-ap">
+    <div class="card-head"><h2 id="h-ap">Prontos para abordar</h2><a class="small" href="/leads?never_contacted=1&amp;score=A&amp;score=B">Ver todos</a></div>
+    {% if approach %}<ul class="mini-list">{% for l in approach %}{{ mini(l) }}{% endfor %}</ul>
+    {% else %}<p class="muted small">Nenhum lead nota A ou B com telefone esperando. <a href="/buscas">Fazer uma busca</a>.</p>{% endif %}
+  </section>
+
+  {% if no_reply %}
+  <section class="card span-3" aria-labelledby="h-nr">
+    <div class="card-head"><h2 id="h-nr">Sem retorno depois do último follow-up</h2><span class="kcount">{{ no_reply|length }}</span></div>
+    <p class="small muted">Abra cada um e decida: mais uma tentativa ou mover para Sem resposta.</p>
+    <ul class="mini-list">{% for l in no_reply[:5] %}{{ mini(l, "Último contato " ~ (l.last_touch_at|day)) }}{% endfor %}</ul>
+  </section>
+  {% endif %}
+  {% if talks %}
+  <section class="card span-3" aria-labelledby="h-tk">
+    <div class="card-head"><h2 id="h-tk">Conversas paradas</h2><span class="kcount">{{ talks|length }}</span></div>
+    <ul class="mini-list">{% for l in talks[:5] %}{{ mini(l, "Em conversa desde " ~ (l.stage_changed_at|day)) }}{% endfor %}</ul>
+  </section>
+  {% endif %}
+  {% if proposals %}
+  <section class="card span-3" aria-labelledby="h-pr">
+    <div class="card-head"><h2 id="h-pr">Propostas sem retorno</h2><span class="kcount">{{ proposals|length }}</span></div>
+    <ul class="mini-list">{% for l in proposals[:5] %}{{ mini(l, (l.proposal_value|money) ~ " · enviada " ~ (l.stage_changed_at|day)) }}{% endfor %}</ul>
+  </section>
+  {% endif %}
+  {% if production %}
+  <section class="card span-3" aria-labelledby="h-pd">
+    <div class="card-head"><h2 id="h-pd">Fechados e em produção</h2><span class="kcount">{{ production|length }}</span></div>
+    <ul class="mini-list">{% for l in production[:5] %}{{ mini(l, l.status_label ~ (" · " ~ (l.proposal_value|money) if l.proposal_value else "")) }}{% endfor %}</ul>
+  </section>
+  {% endif %}
+
+  <section class="card span-4 stack" aria-labelledby="h-fn">
+    <div class="card-head"><h2 id="h-fn">Funil agora</h2><a class="small" href="/funil">Abrir o funil</a></div>
+    {% set sent = counts.ABORDADO + counts.FOLLOWUP %}{% set talk = counts.CONVERSA + counts.PROPOSTA %}{% set won = counts.FECHADO + counts.PRODUCAO + counts.ENTREGUE %}
+    {% set pre = counts.NOVO + counts.ANALISADO + counts.AMOSTRA %}
+    <div class="pipeline" role="img" aria-label="{{ pre }} antes do contato, {{ sent }} abordados, {{ talk }} em conversa ou proposta, {{ won }} fechados">
+      <i style="flex: {{ pre or 0.01 }}"></i><i class="sent" style="flex: {{ sent or 0.01 }}"></i><i class="talk" style="flex: {{ talk or 0.01 }}"></i><i class="won" style="flex: {{ won or 0.01 }}"></i>
+    </div>
+    <div class="row">
+      <a class="chip" href="/leads?status=NOVO&amp;status=ANALISADO&amp;status=AMOSTRA"><b class="num">{{ pre }}</b> antes do contato</a>
+      <a class="chip info" href="/leads?status=ABORDADO&amp;status=FOLLOWUP"><b class="num">{{ sent }}</b> abordados</a>
+      <a class="chip atencao" href="/leads?status=CONVERSA&amp;status=PROPOSTA"><b class="num">{{ talk }}</b> em conversa ou proposta</a>
+      <a class="chip bom" href="/leads?status=FECHADO&amp;status=PRODUCAO&amp;status=ENTREGUE"><b class="num">{{ won }}</b> fechados</a>
+    </div>
+  </section>
+  <section class="card span-2 stack sm" aria-labelledby="h-ck">
+    <h2 id="h-ck">Para conferir</h2>
+    {% if unchecked %}
+    <p><b class="num">{{ unchecked }}</b> lead(s) do OpenStreetMap ainda sem nota do Google.</p>
+    <p class="small muted">O OpenStreetMap não traz nota nem avaliações. Abra o lead, olhe no Maps e anote: a nota do lead melhora.</p>
+    <a class="btn sm" href="/leads?status=NOVO&amp;status=ANALISADO&amp;sort=opportunity">Conferir agora</a>
+    {% else %}<p class="muted small">Nada pendente de conferência.</p>{% endif %}
+    {% if not has_real %}<p class="small muted">Você ainda não tem leads reais. <a href="/buscas">Faça uma busca</a>.</p>{% endif %}
+  </section>
+</div>
+{% endif %}
+{% endblock %}

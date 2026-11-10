@@ -1,0 +1,37 @@
+{% extends "base.html" %}{% from "_macros.html" import icon, score, radar %}
+{% block title %}Sessão de prospecção{% endblock %}
+{% block content %}
+<div class="focus-wrap">
+  <div class="page-head"><div><h1>Sessão de prospecção</h1><p>Um lead por vez. {{ remaining }} na fila.</p></div><a class="btn ghost" href="/">Sair da sessão</a></div>
+  {% if not lead %}
+  <section class="card empty">{{ radar() }}<h2>Fila zerada</h2><p>Não há mais follow-ups nem leads prontos para abordar agora.</p>
+    <div class="row"><a class="btn primary" href="/buscas">Fazer uma busca</a><a class="btn" href="/">Voltar para Hoje</a></div></section>
+  {% else %}
+  {% set next_skip = (skip ~ ',' if skip else '') ~ lead.id %}
+  <section class="card pad-lg stack" aria-labelledby="s-name">
+    <div class="row nowrap" style="align-items:flex-start">{{ score(lead.score, true) }}
+      <div class="grow"><h2 id="s-name">{{ lead.name }}</h2>
+        <p class="small muted">{{ ins.sector.icon }} {{ ins.niche.label }}{% if lead.neighborhood %} · {{ lead.neighborhood }}{% endif %} · {{ lead.status_label }}</p></div>
+      <button type="button" class="btn sm" data-open-lead="{{ lead.id }}">Ver tudo</button></div>
+    <div class="row">{% for s in ins.diag.signals[:5] %}<span class="chip {{ s.tone }}">{{ s.label }}: {{ s.value }}</span>{% endfor %}
+      {% if ins.recs %}<span class="chip accent">Oferecer: {{ ins.recs[0].name }}</span>{% endif %}</div>
+    <p>{{ ins.strategy.angle }}</p>
+    <div class="stack sm">
+      <label for="s-text">{{ KINDS[kind] }} · {{ CHANNELS[channel] }}</label>
+      <textarea class="msg" id="s-text" rows="9">{{ text }}</textarea>
+      {% if not site %}<p class="small muted">Sem amostra. <button type="button" class="chip" hx-post="/leads/{{ lead.id }}/site" hx-swap="none" hx-on::after-request="if(event.detail.successful)location.reload()">Gerar amostra e pôr o link</button></p>
+      {% elif settings().preview_link_is_local %}<p class="small banner">O link da amostra só abre no seu computador. Publique as amostras antes de mandar.</p>{% endif %}
+    </div>
+    <div class="focus-actions">
+      <button type="button" class="btn primary" data-copy="#s-text">{{ icon("copy") }} Copiar</button>
+      {% if wa %}<a class="btn" href="{{ wa }}" target="_blank" rel="noopener noreferrer">Abrir conversa no WhatsApp {{ icon("ext") }}</a>
+      {% elif lead.phone %}<span class="btn" aria-disabled="true">Ligar: {{ lead.phone }}</span>{% endif %}
+      <button type="button" class="btn" hx-post="/leads/{{ lead.id }}/sent?view=none" hx-vals='{"kind": "{{ kind }}", "channel": "{{ channel }}"}' hx-swap="none"
+              hx-on::after-request="if(event.detail.successful)location.href='/sessao?skip={{ skip }}'">{{ icon("check") }} Marquei como enviado</button>
+      <a class="btn ghost" href="/sessao?skip={{ next_skip }}">Pular</a>
+    </div>
+    <p class="xs muted">A app nunca envia nada. Você copia, envia do seu jeito e marca aqui.</p>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

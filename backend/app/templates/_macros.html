@@ -1,0 +1,48 @@
+{% macro icon(name) -%}
+<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+{%- if name == "hoje" %}<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 12l6-6"/>
+{%- elif name == "leads" %}<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+{%- elif name == "buscas" %}<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>
+{%- elif name == "funil" %}<path d="M3 4h18l-7 8v6l-4 2v-8z"/>
+{%- elif name == "servicos" %}<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+{%- elif name == "metricas" %}<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>
+{%- elif name == "config" %}<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>
+{%- elif name == "ajuda" %}<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 1-1 1.7M12 17h.01"/>
+{%- elif name == "tema" %}<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/>
+{%- elif name == "x" %}<path d="M6 6l12 12M18 6 6 18"/>
+{%- elif name == "copy" %}<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>
+{%- elif name == "map" %}<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/>
+{%- elif name == "ext" %}<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>
+{%- elif name == "play" %}<path d="M7 5v14l12-7z"/>
+{%- elif name == "plus" %}<path d="M12 5v14M5 12h14"/>
+{%- elif name == "check" %}<path d="m5 12 5 5 9-10"/>
+{%- elif name == "print" %}<path d="M7 9V4h10v5M7 17H5a1 1 0 0 1-1-1v-5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5a1 1 0 0 1-1 1h-2M7 14h10v6H7z"/>
+{%- elif name == "back" %}<path d="M15 5l-7 7 7 7"/>
+{%- endif %}</svg>
+{%- endmacro %}
+
+{% macro score(value, lg=false, reason=none) -%}
+<span class="score {{ value or '' }}{{ ' lg' if lg }}" title="Nota {{ value or 'sem nota' }}{{ ': ' ~ reason if reason }}"><span class="sr-only">Nota </span>{{ 'D' if value == 'DESCARTE' else (value or '–') }}</span>
+{%- endmacro %}
+
+{% macro status(lead) -%}
+<span class="status {{ lead.status }}"><i class="dot" aria-hidden="true"></i>{{ lead.status_label }}</span>
+{%- endmacro %}
+
+{% macro radar(cls="radar") -%}
+<svg class="{{ cls }}" viewBox="0 0 32 32" aria-hidden="true" focusable="false" fill="none">
+  <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-opacity=".35" stroke-width="1.5"/>
+  <circle cx="16" cy="16" r="8.5" stroke="currentColor" stroke-opacity=".35" stroke-width="1.5"/>
+  <path class="sweep" d="M16 16 26 6" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="16" cy="16" r="2.4" fill="var(--accent)"/><circle cx="22.5" cy="20.5" r="1.6" fill="var(--accent)"/>
+</svg>
+{%- endmacro %}
+
+{% macro mini(lead, sub=None) -%}
+<li><button type="button" class="mini" data-open-lead="{{ lead.id }}">
+  {{ score(lead.score) }}
+  <span class="grow"><span class="name truncate" style="display:block">{{ lead.name }}</span>
+  <span class="sub">{{ sub or (cat().label(lead.niche) ~ (' · ' ~ lead.neighborhood if lead.neighborhood else '')) }}</span></span>
+  {% if lead.next_action_at %}<span class="xs muted nowrap">{{ lead.next_action_at|day }}</span>{% endif %}
+</button></li>
+{%- endmacro %}

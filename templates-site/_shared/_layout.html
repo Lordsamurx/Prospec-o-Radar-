@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{{ name }} · {{ neighborhood or city or "Amostra" }}</title>
+  <meta name="description" content="{{ name }}{% if niche_label %}: {{ niche_label|lower }}{% endif %}{% if neighborhood or city %} em {{ neighborhood or city }}{% endif %}. Amostra de demonstração.">
+  <link rel="stylesheet" href="base.css">
+  <link rel="stylesheet" href="style.css">
+  <style>:root{--brand:{{ palette.brand }};--brand-ink:{{ palette.brand_ink }};--soft:{{ palette.soft }};--deep:{{ palette.deep }};}</style>
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <div class="amostra" role="note">Amostra · página de demonstração feita para {{ name }}. Não é o site oficial.</div>
+  {% block page %}{% endblock %}
+  <footer class="foot">
+    <div class="wrap">
+      <p>© {{ year }} {{ name }} · Dados públicos do negócio.</p>
+      <p class="foot__small">Amostra gerada para apresentação. Fotos, cores, textos e preços são trocados pelos de vocês.</p>
+    </div>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>

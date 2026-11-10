@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Métricas{% endblock %}
+{% macro conv_table(rows, caption, first) %}
+<div class="table-wrap" tabindex="0" role="region" aria-label="{{ caption }}"><table class="table"><caption class="sr-only">{{ caption }}</caption>
+  <thead><tr><th scope="col">{{ first }}</th><th scope="col" class="n">Leads</th><th scope="col" class="n">Abordados</th><th scope="col" class="n">Responderam</th><th scope="col" class="n">Fechados</th><th scope="col" class="n">Resposta</th><th scope="col" class="n">Fechamento</th></tr></thead>
+  <tbody>{% for r in rows %}<tr><th scope="row">{{ r.label }}</th><td class="n">{{ r.leads }}</td><td class="n">{{ r.approached }}</td><td class="n">{{ r.talked }}</td><td class="n">{{ r.won }}</td>
+    <td class="n">{{ r.reply_rate ~ '%' if r.reply_rate is not none else '—' }}</td><td class="n">{{ r.win_rate ~ '%' if r.win_rate is not none else '—' }}</td></tr>{% endfor %}</tbody></table></div>
+{% endmacro %}
+{% block content %}
+<div class="page-head"><div><h1>Métricas</h1><p>O que está funcionando no seu funil.</p></div></div>
+{% if total == 0 %}
+<section class="card empty"><h2>Ainda sem números</h2><p>As métricas aparecem quando houver leads e abordagens marcadas como enviadas.</p><a class="btn primary" href="/buscas">Fazer uma busca</a></section>
+{% else %}
+<div class="bento">
+  <section class="card span-2 stack sm"><p class="eyebrow">Fechado no mês</p><p class="stat">{{ revenue_month|money }}</p><p class="small muted">{{ won_month }} venda(s)</p></section>
+  <section class="card span-2 stack sm"><p class="eyebrow">Receita mensal recorrente</p><p class="stat">{{ recurring|money }}</p><p class="small muted">mensalidades de clientes fechados</p></section>
+  <section class="card span-2 stack sm"><p class="eyebrow">Propostas em aberto</p><p class="stat">{{ open_proposals|money }}</p><p class="small muted">aguardando resposta</p></section>
+
+  <section class="card span-3 stack" aria-labelledby="m-steps">
+    <h2 id="m-steps">Conversão entre etapas</h2>
+    <div class="bars">{% set base = steps[0].count or 1 %}
+      {% for s in steps %}<div class="bar-row"><span>{{ s.label }}</span><span class="meter" aria-hidden="true"><i style="--v: {{ (100 * s.count / base)|round|int }}%"></i></span>
+        <span class="small num"><b>{{ s.count }}</b>{% if s.rate is not none %} <span class="muted">({{ s.rate }}%)</span>{% endif %}</span></div>{% endfor %}
+    </div>
+    <p class="xs muted">Entre parênteses: quantos chegaram ali vindo da etapa anterior.</p>
+  </section>
+  <section class="card span-3 stack" aria-labelledby="m-weeks">
+    <h2 id="m-weeks">Abordagens por semana</h2>
+    {% set top = (weeks|map(attribute="count")|max) or 1 %}
+    <div class="spark" role="img" aria-label="Abordagens nas últimas 8 semanas: {% for w in weeks %}{{ w.label }}: {{ w.count }}{{ ', ' if not loop.last }}{% endfor %}">
+      {% for w in weeks %}<div class="col"><b>{{ w.count }}</b><i style="--h: {{ (88 * w.count / top)|round|int }}px"></i><span>{{ w.label }}</span></div>{% endfor %}
+    </div>
+    <p class="xs muted">Meta atual: {{ ctx.weekly_goal }} por semana.</p>
+  </section>
+
+  <section class="card span-6 stack" aria-labelledby="m-niche"><h2 id="m-niche">Por nicho</h2>{{ conv_table(by_niche, "Conversão por nicho", "Nicho") }}</section>
+  <section class="card span-3 stack" aria-labelledby="m-sector"><h2 id="m-sector">Por setor</h2>{{ conv_table(by_sector, "Conversão por setor", "Setor") }}</section>
+  <section class="card span-3 stack" aria-labelledby="m-svc"><h2 id="m-svc">Por serviço</h2>
+    {% if by_service %}{{ conv_table(by_service, "Conversão por serviço", "Serviço") }}{% else %}<p class="muted small">Sem dados ainda.</p>{% endif %}</section>
+  <section class="card span-3 stack" aria-labelledby="m-time"><h2 id="m-time">Tempo médio em cada etapa</h2>
+    {% if stage_time %}<dl class="kv">{% for s in stage_time %}<dt>{{ s.label }}</dt><dd>{{ ('%g'|format(s.days))|replace('.', ',') }} dia(s) <span class="muted">({{ s.n }} passagens)</span></dd>{% endfor %}</dl>
+    {% else %}<p class="muted small">Aparece quando os leads começarem a mudar de etapa.</p>{% endif %}</section>
+  <section class="card span-3 stack" aria-labelledby="m-lost"><h2 id="m-lost">Por que perdeu</h2>
+    {% if lost %}<dl class="kv">{% for k, n in lost.items() %}<dt>{{ LOST_REASONS.get(k, k) }}</dt><dd>{{ n }}</dd>{% endfor %}</dl>
+    {% else %}<p class="muted small">Nenhum lead perdido.</p>{% endif %}</section>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "_layout.html" %}
+{% block body_class %}links-body{% endblock %}
+{% block page %}
+<main class="links">
+  <div class="avatar" aria-hidden="true">{{ sector_icon }}</div>
+  <h1>{{ name }}</h1>
+  <p class="sub">{% if niche_label %}{{ niche_label }} · {% endif %}{{ neighborhood or city }}</p>
+  {% if rating %}<p class="rating"><span aria-hidden="true">★</span> {{ rating_text }} no Google · {{ reviews_count }} avaliações</p>{% endif %}
+  <p class="tag">{{ tagline }}</p>
+  <ul class="stack" aria-label="Links">
+    {% if whatsapp_url %}<li><a class="link link--main" href="{{ whatsapp_url }}" target="_blank" rel="noopener">{{ cta }}</a></li>{% endif %}
+    {% if phone %}<li><a class="link" href="tel:{{ phone_digits }}">Ligar: {{ phone }}</a></li>{% endif %}
+    {% if maps_url %}<li><a class="link" href="{{ maps_url }}" target="_blank" rel="noopener">Como chegar</a></li>
+    <li><a class="link" href="{{ maps_url }}" target="_blank" rel="noopener">Ver avaliações no Google</a></li>{% endif %}
+  </ul>
+  <section aria-labelledby="h-l-serv"><h2 id="h-l-serv">O que fazemos</h2>
+    <ul class="chips">{% for s in services %}<li><span aria-hidden="true">{{ s.icon }}</span> {{ s.title }}</li>{% endfor %}</ul></section>
+  {% if hours %}<section aria-labelledby="h-l-hor"><h2 id="h-l-hor">Horário</h2><ul class="hours">{% for h in hours %}<li>{{ h }}</li>{% endfor %}</ul></section>{% endif %}
+</main>
+{% endblock %}

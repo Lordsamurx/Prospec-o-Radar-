@@ -1,0 +1,2 @@
+{% if whatsapp_url %}<a class="btn btn--main" href="{{ whatsapp_url }}" target="_blank" rel="noopener">{{ cta }}</a>{% elif phone %}<a class="btn btn--main" href="tel:{{ phone_digits }}">Ligar: {{ phone }}</a>{% endif %}
+{% if maps_url %}<a class="btn btn--ghost" href="{{ maps_url }}" target="_blank" rel="noopener">Como chegar</a>{% endif %}

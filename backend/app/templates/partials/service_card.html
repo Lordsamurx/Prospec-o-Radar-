@@ -1,0 +1,22 @@
+<article class="card svc {{ '' if s.active else 'off' }}" id="svc-{{ s.key }}" aria-labelledby="svc-h-{{ s.key }}">
+  <div class="row between"><h3 id="svc-h-{{ s.key }}">{{ s.name }}</h3>
+    {% if not s.active %}<span class="chip">Desligado</span>{% elif s.recurring %}<span class="chip info">Mensal</span>{% endif %}</div>
+  <p class="small muted">{{ s.description }}</p>
+  <p class="price">{{ s.price_text }}</p>
+  <p class="small"><a href="/leads?service={{ s.key }}"><b class="num">{{ by_service.get(s.key, 0) }}</b> lead(s) com esta recomendação</a>{% if s.deadline %} · prazo: {{ s.deadline }}{% endif %}</p>
+  {% if s.delivers %}<details class="disclosure"><summary>O que entrega</summary><ul class="small stack sm">{% for d in s.delivers %}<li>• {{ d }}</li>{% endfor %}</ul></details>{% endif %}
+  <details class="disclosure" {{ 'open' if saved }}><summary>Editar preço e texto</summary>
+    <form class="stack sm" hx-post="/servicos/{{ s.key }}" hx-target="#svc-{{ s.key }}" hx-swap="outerHTML">
+      <input type="hidden" name="_form" value="1">
+      <div class="field"><label for="sn-{{ s.key }}">Nome</label><input type="text" id="sn-{{ s.key }}" name="name" value="{{ s.name }}" required maxlength="80"></div>
+      <div class="form-grid">
+        <div class="field"><label for="sp1-{{ s.key }}">Preço de (R$)</label><input type="text" inputmode="decimal" id="sp1-{{ s.key }}" name="price_min" value="{{ ('%g'|format(s.price_min))|replace('.', ',') if s.price_min is not none else '' }}"></div>
+        <div class="field"><label for="sp2-{{ s.key }}">Preço até (R$)</label><input type="text" inputmode="decimal" id="sp2-{{ s.key }}" name="price_max" value="{{ ('%g'|format(s.price_max))|replace('.', ',') if s.price_max is not none else '' }}"></div>
+        <div class="field"><label for="sd-{{ s.key }}">Prazo</label><input type="text" id="sd-{{ s.key }}" name="deadline" value="{{ s.deadline }}" maxlength="60"></div>
+      </div>
+      <div class="field"><label for="sx-{{ s.key }}">Descrição</label><textarea id="sx-{{ s.key }}" name="description" rows="2" maxlength="400">{{ s.description }}</textarea></div>
+      <label class="check"><input type="checkbox" name="active" value="1" {{ 'checked' if s.active }}> Ofereço este serviço</label>
+      <div><button class="btn sm primary" type="submit">Salvar</button></div>
+    </form>
+  </details>
+</article>

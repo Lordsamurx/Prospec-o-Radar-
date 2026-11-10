@@ -1,0 +1,4 @@
+{% if quota.limited %}<a class="chip {{ 'ruim' if quota.blocked else ('atencao' if quota.percent >= 80 else '') }}" href="/buscas" title="Buscas no Google hoje. O limite volta à meia-noite.">
+  <span class="num">Google {{ quota.used_today }}/{{ quota.limit }}</span><span class="sr-only"> buscas usadas hoje</span></a>
+{% else %}<a class="chip" href="/buscas" title="Fonte dos dados das buscas">{{ PROVIDER_LABELS.get(quota.provider, quota.provider) }}</a>{% endif %}
+{% if quota.pending_jobs %}<a class="chip info" href="/buscas#fila">{{ quota.pending_jobs }} na fila</a>{% endif %}

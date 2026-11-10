@@ -1,0 +1,15 @@
+{% from "_macros.html" import icon %}<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">
+<title>{% block title %}{% endblock %} · Radar</title>
+<script>(function(){try{var t=localStorage.getItem("radar-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}})()</script>
+<link rel="stylesheet" href="/static/css/tokens.css"><link rel="stylesheet" href="/static/css/app.css"><link rel="icon" href="/static/favicon.svg" type="image/svg+xml"></head>
+<body class="doc-body">
+<header class="doc-bar no-print">
+  <a class="btn sm ghost" href="/leads/{{ lead.id }}">{{ icon("back") }} Voltar ao lead</a>
+  <span class="grow"></span>
+  {% block bar %}{% endblock %}
+  <button type="button" class="btn sm primary" onclick="window.print()">{{ icon("print") }} Imprimir ou salvar em PDF</button>
+</header>
+<main>{% block doc %}{% endblock %}</main>
+</body></html>

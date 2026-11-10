@@ -1,0 +1,37 @@
+{% extends "_doc.html" %}
+{% block title %}Proposta · {{ lead.name }}{% endblock %}
+{% block bar %}<button type="submit" form="prop-form" class="btn sm">Salvar valores</button>{% endblock %}
+{% block doc %}
+<form id="prop-form" method="post" action="/leads/{{ lead.id }}/proposta" class="doc">
+  <header class="stack sm">
+    <p class="muted">Proposta comercial · {{ created|date }}</p>
+    <h1>{{ lead.name }}</h1>
+    <p class="muted">Preparada por {{ ctx.seller.name }}{% if ctx.seller.city %} · {{ ctx.seller.city }}{% endif %}</p>
+  </header>
+  <section class="stack sm"><h2>O que vimos</h2>
+    <ul class="ticks">{% for s in ins.diag.signals if s.tone in ("ruim", "atencao") and s.dimension != "porte" %}<li>{{ s.phrase }}</li>{% else %}<li>A presença digital de vocês já tem uma boa base. A proposta é para dar o próximo passo.</li>{% endfor %}</ul>
+  </section>
+  <section class="stack sm"><h2>O que propomos</h2>
+    {% if items %}
+    <table><thead><tr><th scope="col">Serviço</th><th scope="col">Prazo</th><th scope="col" class="n">Investimento (R$)</th></tr></thead>
+      <tbody>{% for i in items %}<tr>
+        <td><b>{{ i.name }}</b><br><span class="muted">{{ i.description }}</span>
+          {% if i.delivers %}<ul class="ticks" style="margin-top:6px">{% for d in i.delivers %}<li>{{ d }}</li>{% endfor %}</ul>{% endif %}</td>
+        <td>{{ i.deadline or '—' }}</td>
+        <td class="n"><label class="sr-only" for="p-{{ i.key }}">Valor de {{ i.name }}</label>
+          <input type="text" inputmode="decimal" id="p-{{ i.key }}" name="preco_{{ i.key }}" value="{{ ('%.2f'|format(i.price))|replace('.', ',') if i.price is not none else '' }}" placeholder="a definir" style="width:8.5rem;text-align:right">
+          {% if i.recurring %}<br><span class="muted">por mês</span>{% endif %}</td>
+      </tr>{% endfor %}</tbody></table>
+    <p class="total">{% if total is not none %}Total: {{ total|money }}{% else %}Total: a definir{% endif %}{% if monthly is not none %} <span class="muted" style="font-size:1rem">+ {{ monthly|money }} por mês</span>{% endif %}</p>
+    <p class="muted no-print">Digite os valores e clique em “Salvar valores” antes de imprimir.</p>
+    {% else %}<p>Nenhum serviço escolhido. Volte ao lead e marque o que oferecer.</p>{% endif %}
+  </section>
+  {% if preview %}<section class="stack sm"><h2>Amostra</h2><p>Preparamos uma amostra de como pode ficar: {% if sample_url %}<a href="{{ sample_url }}">{{ sample_url }}</a>{% else %}<a href="{{ preview }}">{{ preview }}</a>{% endif %}</p></section>{% endif %}
+  <section class="stack sm"><h2>Condições</h2>
+    <label class="sr-only" for="p-notes">Condições e observações</label>
+    <textarea id="p-notes" name="notes" rows="3" placeholder="Forma de pagamento, o que não está incluso...">{{ notes or '' }}</textarea>
+    <p>Proposta válida por <label class="sr-only" for="p-days">Dias de validade</label><input type="number" id="p-days" name="validity_days" min="1" max="90" value="{{ days }}" style="width:4.5rem;display:inline-block;min-height:32px"> dias, até {{ valid_until|date }}.</p>
+  </section>
+  <footer class="muted"><p>{{ ctx.seller.name }} · {{ ctx.seller.what }}</p></footer>
+</form>
+{% endblock %}

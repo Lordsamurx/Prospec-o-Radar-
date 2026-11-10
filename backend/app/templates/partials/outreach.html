@@ -1,0 +1,14 @@
+{% from "_macros.html" import icon %}
+<div class="stack sm">
+  <label for="draft-{{ draft.id }}">{{ KINDS[kind] }} · {{ CHANNELS[channel] }}{% if draft.by_ai %} · reescrita com IA{% endif %}{% if draft.sent_at %} · marcada como enviada em {{ draft.sent_at|dt }}{% endif %}</label>
+  {% if ai_failed %}<p class="banner">A IA não respondeu agora. Este é o texto padrão.</p>{% endif %}
+  <textarea class="msg" id="draft-{{ draft.id }}" rows="9">{{ draft.text }}</textarea>
+  {% if local %}<p class="small banner">O link da amostra neste texto só abre no seu computador. Publique as amostras antes de mandar.</p>{% endif %}
+  {% if not has_site %}<p class="small muted">Sem amostra ainda: gere uma para o texto levar o link.</p>{% endif %}
+  <div class="row">
+    <button type="button" class="btn primary" data-copy="#draft-{{ draft.id }}">{{ icon("copy") }} Copiar</button>
+    {% if wa %}<a class="btn" href="{{ wa }}" target="_blank" rel="noopener noreferrer">Abrir conversa no WhatsApp {{ icon("ext") }}</a>{% endif %}
+    {% if not draft.sent_at %}<button type="button" class="btn" hx-post="/outreach/{{ draft.id }}/sent" hx-target="#drawer-body">{{ icon("check") }} Marquei como enviado</button>{% endif %}
+  </div>
+  <p class="xs muted">“Abrir conversa” só abre o WhatsApp com o texto pronto. Você confere e aperta enviar lá.</p>
+</div>

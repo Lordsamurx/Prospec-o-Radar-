@@ -1,0 +1,17 @@
+{% extends "_doc.html" %}
+{% block title %}Diagnóstico · {{ lead.name }}{% endblock %}
+{% block doc %}
+<article class="doc">
+  <header class="stack sm"><p class="muted">Diagnóstico de presença digital · {{ now|date }}</p><h1>{{ lead.name }}</h1>
+    <p class="muted">{{ ins.niche.label }}{% if lead.neighborhood %} · {{ lead.neighborhood }}{% endif %}{% if lead.city %} · {{ lead.city }}{% endif %}</p></header>
+  <section class="stack sm"><h2>Como vocês aparecem hoje</h2>
+    <table><thead><tr><th scope="col">Ponto</th><th scope="col">Situação</th></tr></thead><tbody>
+      {% for s in ins.diag.signals if s.dimension != "porte" %}<tr><th scope="row">{{ s.label }}</th><td><b>{{ s.value }}</b><br><span class="muted">{{ s.phrase }}</span></td></tr>{% endfor %}
+    </tbody></table></section>
+  {% if problems %}<section class="stack sm"><h2>O que isso custa</h2><ul class="ticks">{% for p in problems %}<li>{{ p }}</li>{% endfor %}</ul></section>{% endif %}
+  {% if ins.recs %}<section class="stack sm"><h2>O que resolveria</h2>
+    <ul class="ticks">{% for r in ins.recs[:4] %}<li><b>{{ r.name }}.</b> {{ r.reason }}</li>{% endfor %}</ul></section>{% endif %}
+  {% if sample_url %}<section class="stack sm"><h2>Amostra</h2><p>Veja como pode ficar: <a href="{{ sample_url }}">{{ sample_url }}</a></p></section>{% endif %}
+  <footer class="muted"><p>Feito por {{ ctx.seller.name }} com dados públicos do negócio. {{ ctx.seller.what|capitalize }}.</p></footer>
+</article>
+{% endblock %}

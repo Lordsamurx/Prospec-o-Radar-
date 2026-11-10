@@ -1,0 +1,180 @@
+# Catálogo do que o Samuel vende. Editável também na tela Serviços (o que for mudado lá
+# fica no banco e prevalece sobre este arquivo). Preço vazio = "a definir".
+#   kind: site (gera amostra), google, conteudo, infra
+#   template: modelo de amostra usado quando este é o serviço principal
+services:
+  - key: gmn_otimizacao
+    name: "Otimização do Google Meu Negócio"
+    short: "Perfil completo no Google"
+    description: "Seu perfil no Google completo e bem cuidado, para aparecer mais para quem procura na região."
+    delivers: ["Categorias e descrição revisadas", "Fotos organizadas", "Horário e contatos certos", "Link de WhatsApp e do site", "Primeiros posts"]
+    price_min:
+    price_max:
+    deadline: "3 dias"
+    recurring: false
+    active: true
+    kind: google
+    combines_with: [avaliacoes, landing, seo_local]
+  - key: gmn_criacao
+    name: "Criação ou reivindicação do perfil no Google"
+    short: "Colocar o negócio no Maps"
+    description: "Para quem ainda não aparece no Google Maps: criamos ou recuperamos o perfil e deixamos pronto para receber clientes."
+    delivers: ["Criação ou reivindicação do perfil", "Verificação com o Google", "Dados, fotos e horário preenchidos"]
+    price_min:
+    price_max:
+    deadline: "até 2 semanas (depende da verificação do Google)"
+    recurring: false
+    active: true
+    kind: google
+    combines_with: [gmn_otimizacao, landing]
+  - key: avaliacoes
+    name: "Gestão de avaliações"
+    short: "Mais avaliações no Google"
+    description: "Um jeito simples de pedir avaliação a cada cliente satisfeito e responder todas com capricho."
+    delivers: ["QR code para o balcão", "Link curto para mandar no WhatsApp", "Modelos de resposta para elogios e críticas"]
+    price_min:
+    price_max:
+    deadline: "2 dias"
+    recurring: false
+    active: true
+    kind: google
+    combines_with: [gmn_otimizacao]
+  - key: landing
+    name: "Landing page"
+    short: "Uma página que vira conversa"
+    description: "Uma página só, rápida e bonita no celular, feita para a pessoa clicar no WhatsApp."
+    delivers: ["Página única com seus serviços", "Botão de WhatsApp em destaque", "Mapa, horário e avaliações", "Pronta para o celular"]
+    price_min:
+    price_max:
+    deadline: "5 dias"
+    recurring: false
+    active: true
+    kind: site
+    template: landing
+    combines_with: [manutencao, dominio_email, gmn_otimizacao]
+  - key: institucional
+    name: "Site institucional"
+    short: "Site completo com domínio próprio"
+    description: "Site com várias seções ou páginas, com a cara do negócio e domínio próprio."
+    delivers: ["Início, sobre, serviços e contato", "Domínio próprio configurado", "Formulário e WhatsApp", "Pronto para o celular e para o Google"]
+    price_min:
+    price_max:
+    deadline: "10 a 15 dias"
+    recurring: false
+    active: true
+    kind: site
+    template: institucional
+    combines_with: [manutencao, dominio_email, seo_local]
+  - key: cardapio
+    name: "Cardápio digital"
+    short: "Cardápio online com pedido no WhatsApp"
+    description: "Seu cardápio no celular do cliente, com pedido direto no seu WhatsApp e sem taxa por pedido."
+    delivers: ["Cardápio com categorias e preços", "Pedido montado e enviado pelo WhatsApp", "QR code para as mesas", "Você mesmo atualiza os itens"]
+    price_min:
+    price_max:
+    deadline: "5 dias"
+    recurring: false
+    active: true
+    kind: site
+    template: cardapio
+    combines_with: [landing, manutencao, gmn_otimizacao]
+  - key: agendamento
+    name: "Página de agendamento"
+    short: "Serviços e horários com agendar no WhatsApp"
+    description: "Uma página com seus serviços e horários, para o cliente pedir o agendamento pelo WhatsApp em dois toques."
+    delivers: ["Lista de serviços com duração e preço", "Escolha de dia e período", "Pedido de agendamento pelo WhatsApp"]
+    price_min:
+    price_max:
+    deadline: "5 dias"
+    recurring: false
+    active: true
+    kind: site
+    template: agendamento
+    combines_with: [landing, manutencao, gmn_otimizacao]
+  - key: catalogo
+    name: "Catálogo ou loja simples"
+    short: "Vitrine de produtos com pedido no WhatsApp"
+    description: "Seus produtos numa vitrine online, com pedido pelo WhatsApp. Sem mensalidade de plataforma."
+    delivers: ["Vitrine com fotos e preços", "Pedido pelo WhatsApp", "Categorias e busca"]
+    price_min:
+    price_max:
+    deadline: "7 dias"
+    recurring: false
+    active: true
+    kind: site
+    template: landing
+    combines_with: [manutencao, carrosseis]
+  - key: links
+    name: "Página de links própria"
+    short: "Substitui o Linktree"
+    description: "Uma página de links com a cara do negócio, no seu domínio, para pôr na bio do Instagram."
+    delivers: ["Botões para WhatsApp, cardápio, agenda e mapa", "Visual da marca", "Endereço próprio"]
+    price_min:
+    price_max:
+    deadline: "2 dias"
+    recurring: false
+    active: true
+    kind: site
+    template: links
+    combines_with: [landing, carrosseis]
+  - key: reformulacao
+    name: "Reformulação de site"
+    short: "Site atual mais rápido, seguro e bonito"
+    description: "Seu site atual refeito: seguro (cadeado), rápido, bom no celular e com visual novo."
+    delivers: ["HTTPS (cadeado)", "Versão para celular", "Mais velocidade", "Visual novo mantendo o conteúdo"]
+    price_min:
+    price_max:
+    deadline: "10 dias"
+    recurring: false
+    active: true
+    kind: site
+    template: institucional
+    combines_with: [manutencao, seo_local]
+  - key: seo_local
+    name: "SEO local"
+    short: "Páginas por bairro e por serviço"
+    description: "Páginas pensadas para quem pesquisa o seu serviço no seu bairro, para aparecer mais no Google."
+    delivers: ["Páginas por bairro atendido", "Páginas por serviço", "Títulos e descrições para o Google"]
+    price_min:
+    price_max:
+    deadline: "10 dias"
+    recurring: false
+    active: true
+    kind: conteudo
+    combines_with: [institucional, gmn_otimizacao]
+  - key: dominio_email
+    name: "Domínio e e-mail profissional"
+    short: "seunegocio.com.br e contato@"
+    description: "Endereço próprio na internet e e-mail com o nome do negócio."
+    delivers: ["Registro do domínio", "E-mail profissional configurado"]
+    price_min:
+    price_max:
+    deadline: "2 dias"
+    recurring: false
+    active: true
+    kind: infra
+    combines_with: [landing, institucional]
+  - key: carrosseis
+    name: "Carrosséis e conteúdo para Instagram"
+    short: "Posts prontos para publicar"
+    description: "Carrosséis e posts prontos, com a identidade do negócio, para manter o Instagram ativo."
+    delivers: ["Pacote de carrosséis", "Legendas prontas", "Calendário de postagem"]
+    price_min:
+    price_max:
+    deadline: "7 dias"
+    recurring: true
+    active: true
+    kind: conteudo
+    combines_with: [links, landing]
+  - key: manutencao
+    name: "Plano de manutenção e hospedagem"
+    short: "Site no ar e atualizado, por mês"
+    description: "Seu site sempre no ar, seguro e atualizado. Você pede a alteração e a gente faz."
+    delivers: ["Hospedagem", "Pequenas alterações mensais", "Backup e segurança"]
+    price_min:
+    price_max:
+    deadline: "mensal"
+    recurring: true
+    active: true
+    kind: infra
+    combines_with: [landing, institucional, cardapio, agendamento]

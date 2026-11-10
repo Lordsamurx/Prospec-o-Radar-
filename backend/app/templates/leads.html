@@ -1,0 +1,103 @@
+{% extends "base.html" %}{% from "_macros.html" import icon %}
+{% block title %}Leads{% endblock %}
+{% block head %}<link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css"><link rel="stylesheet" href="/static/vendor/leaflet/MarkerCluster.css">{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Leads</h1><p>Negócios encontrados, do mais quente ao mais frio.</p></div>
+  <div class="row">
+    <button type="button" class="btn" data-dialog-open="#manual-dialog">{{ icon("plus") }} Adicionar à mão</button>
+    <a class="btn primary" href="/buscas">{{ icon("buscas") }} Nova busca</a>
+  </div>
+</div>
+
+<form id="filters" class="stack" action="/leads" method="get" hx-get="/leads" hx-target="#results" hx-push-url="true"
+      hx-trigger="change, submit, input changed delay:350ms from:#q" role="search" aria-label="Filtros de leads">
+  <input type="hidden" name="view" value="{{ view }}">
+  <div class="filterbar">
+    <div class="field"><label for="q">Buscar pelo nome</label><input type="search" id="q" name="q" value="{{ f.q or '' }}" placeholder="Nome do negócio" autocomplete="off"></div>
+    <div class="field"><span class="label" id="l-niche">Nicho</span>
+      <details class="dropdown" id="f-niche">
+        <summary aria-labelledby="l-niche f-niche-sum"><span id="f-niche-sum" class="truncate">{% if f.niche %}{{ f.niche|length }} escolhido{{ 's' if f.niche|length > 1 }}{% else %}Todos ({{ all_count }}){% endif %}</span></summary>
+        <div class="panel" role="group" aria-labelledby="l-niche">
+          {% for sector, rows, n in niche_groups %}<p class="group">{{ sector.icon }} {{ sector.label }} ({{ n }})</p>
+          {% for niche, c in rows %}<label class="check"><input type="checkbox" name="niche" value="{{ niche.key }}" {{ 'checked' if niche.key in f.niche }}> {{ niche.label }} <span class="muted num">({{ c }})</span></label>{% endfor %}{% endfor %}
+          {% if not niche_groups %}<p class="small muted">Nenhum lead ainda.</p>{% endif %}
+        </div>
+      </details></div>
+    <div class="field"><label for="f-site">Site</label>
+      <select id="f-site" name="site"><option value="">Tanto faz</option>
+        <option value="sem" {{ 'selected' if f.site == 'sem' }}>Sem site próprio</option><option value="com" {{ 'selected' if f.site == 'com' }}>Com site próprio</option></select></div>
+    <div class="field"><label for="f-score">Nota do lead</label>
+      <select id="f-score" name="score"><option value="">Todas</option>
+        {% for s in SCORES %}<option value="{{ s }}" {{ 'selected' if f.score == [s] }}>{{ 'Descarte' if s == 'DESCARTE' else 'Nota ' ~ s }}</option>{% endfor %}
+        <option value="A,B" {{ 'selected' if f.score == ['A', 'B'] }}>A e B</option></select></div>
+    <div class="field"><label for="f-sort">Ordem</label>
+      <select id="f-sort" name="sort">
+        {% for k, v in [("score", "Nota e oportunidade"), ("opportunity", "Oportunidade"), ("reviews", "Mais avaliações"), ("rating", "Melhor nota no Google"), ("newest", "Mais recentes"), ("next_action", "Próxima ação")] %}
+        <option value="{{ k }}" {{ 'selected' if f.sort == k }}>{{ v }}</option>{% endfor %}</select></div>
+  </div>
+  <details class="disclosure" {{ 'open' if more_count }}>
+    <summary>Mais filtros{% if more_count %} <span class="kcount">{{ more_count }}</span>{% endif %}</summary>
+    <div class="form-grid" style="padding-top: var(--s-2)">
+      <div class="field"><label for="f-status">Etapa</label><select id="f-status" name="status"><option value="">Todas</option>
+        {% for s in STATUSES %}<option value="{{ s }}" {{ 'selected' if s in f.status }}>{{ STATUS_LABELS[s] }}</option>{% endfor %}</select></div>
+      <div class="field"><label for="f-profile">Perfil</label><select id="f-profile" name="profile"><option value="">Todos</option>
+        {% for k, v in PROFILES.items() %}<option value="{{ k }}" {{ 'selected' if k in f.profile }}>{{ v[0] }}</option>{% endfor %}</select></div>
+      <div class="field"><label for="f-service">Serviço recomendado</label><select id="f-service" name="service"><option value="">Todos</option>
+        {% for k, s in services.items() if s.active %}<option value="{{ k }}" {{ 'selected' if k in f.service }}>{{ s.name }}</option>{% endfor %}</select></div>
+      <div class="field"><label for="f-sitest">Tipo de site</label><select id="f-sitest" name="site_status"><option value="">Todos</option>
+        {% for k, v in SITE_LABELS.items() %}<option value="{{ k }}" {{ 'selected' if k in f.site_status }}>{{ v }}</option>{% endfor %}</select></div>
+      <div class="field"><label for="f-city">Cidade</label><select id="f-city" name="city"><option value="">Todas</option>
+        {% for c in cities %}<option {{ 'selected' if f.city and f.city|lower == c|lower }}>{{ c }}</option>{% endfor %}</select></div>
+      <div class="field"><label for="f-hood">Bairro</label><select id="f-hood" name="neighborhood"><option value="">Todos</option>
+        {% for n in neighborhoods %}<option {{ 'selected' if f.neighborhood and f.neighborhood|lower == n|lower }}>{{ n }}</option>{% endfor %}</select></div>
+      <div class="field"><label for="f-radius">Raio (km)</label><input type="text" inputmode="decimal" id="f-radius" name="radius_km" value="{{ '%g'|format(f.radius_km) if f.radius_km else '' }}" placeholder="do bairro ou do centro"></div>
+      <div class="field"><label for="f-minr">Nota mínima no Google</label><input type="text" inputmode="decimal" id="f-minr" name="min_rating" value="{{ '%g'|format(f.min_rating) if f.min_rating is not none else '' }}" placeholder="4,0"></div>
+      <div class="field"><label for="f-minrev">Avaliações (mínimo)</label><input type="number" min="0" id="f-minrev" name="min_reviews" value="{{ f.min_reviews if f.min_reviews is not none else '' }}"></div>
+      <div class="field"><label for="f-maxrev">Avaliações (máximo)</label><input type="number" min="0" id="f-maxrev" name="max_reviews" value="{{ f.max_reviews if f.max_reviews is not none else '' }}"></div>
+      <div class="field"><label for="f-photos">Fotos (mínimo)</label><input type="number" min="0" id="f-photos" name="min_photos" value="{{ f.min_photos if f.min_photos is not none else '' }}"></div>
+      <div class="field"><label for="f-phone">Telefone</label><select id="f-phone" name="has_phone"><option value="">Tanto faz</option>
+        <option value="yes" {{ 'selected' if f.has_phone == 'yes' }}>Tem</option><option value="no" {{ 'selected' if f.has_phone == 'no' }}>Não tem</option></select></div>
+      <div class="field"><label for="f-ptype">Tipo de número</label><select id="f-ptype" name="phone_type"><option value="">Tanto faz</option>
+        <option value="mobile" {{ 'selected' if f.phone_type == 'mobile' }}>Celular</option><option value="landline" {{ 'selected' if f.phone_type == 'landline' }}>Fixo</option></select></div>
+      <div class="field"><label for="f-hours">Horário cadastrado</label><select id="f-hours" name="has_hours"><option value="">Tanto faz</option>
+        <option value="yes" {{ 'selected' if f.has_hours == 'yes' }}>Tem</option><option value="no" {{ 'selected' if f.has_hours == 'no' }}>Não tem</option></select></div>
+      <div class="field"><label for="f-nrd">Sem resposta há (dias)</label><input type="number" min="0" id="f-nrd" name="no_reply_days" value="{{ f.no_reply_days if f.no_reply_days is not none else '' }}"></div>
+      <div class="field"><label for="f-tag">Tag</label><select id="f-tag" name="tag"><option value="">Todas</option>
+        {% for t in tags %}<option {{ 'selected' if t in f.tag }}>{{ t }}</option>{% endfor %}</select></div>
+    </div>
+    <div class="row" style="padding-top: var(--s-2)">
+      <label class="check"><input type="checkbox" name="never_contacted" value="1" {{ 'checked' if f.never_contacted }}> Nunca abordado</label>
+      <label class="check"><input type="checkbox" name="overdue" value="1" {{ 'checked' if f.overdue }}> Ação vencida</label>
+      <label class="check"><input type="checkbox" name="operational_only" value="1" {{ 'checked' if f.operational_only }}> Só funcionando</label>
+      <label class="check"><input type="checkbox" name="hide_franchises" value="1" {{ 'checked' if f.hide_franchises }}> Esconder franquias</label>
+      <label class="check"><input type="checkbox" name="stale" value="1" {{ 'checked' if f.stale }}> Dados com mais de 30 dias</label>
+      <label class="check"><input type="checkbox" name="show_archived" value="1" {{ 'checked' if f.show_archived }}> Mostrar arquivados</label>
+      {% if not mock_mode %}<label class="check"><input type="checkbox" name="show_mock" value="1" {{ 'checked' if f.show_mock }}> Mostrar fictícios</label>{% endif %}
+    </div>
+  </details>
+  <noscript><button class="btn primary" type="submit">Filtrar</button></noscript>
+</form>
+
+<div id="results" hx-get="/leads" hx-include="#filters" hx-trigger="leads-changed from:body" hx-target="this" aria-live="polite">
+  {% include "partials/lead_list.html" %}
+</div>
+
+<dialog id="manual-dialog" aria-labelledby="manual-title">
+  <form class="dlg" hx-post="/leads/manual" hx-swap="none" hx-on::after-request="if(event.detail.successful){this.reset();this.closest('dialog').close()}">
+    <h2 id="manual-title">Adicionar lead à mão</h2>
+    <p class="muted small">Use para um negócio que você mesmo viu ou que foi indicado. Só dados públicos do negócio.</p>
+    <div class="field"><label for="m-name">Nome do negócio</label><input type="text" id="m-name" name="name" required minlength="2" maxlength="200"></div>
+    <div class="form-grid">
+      <div class="field"><label for="m-niche">Tipo de negócio</label><input type="text" id="m-niche" name="niche" placeholder="barbearia, pizzaria..." list="niche-list"></div>
+      <div class="field"><label for="m-phone">Telefone</label><input type="tel" id="m-phone" name="phone" placeholder="(31) 9 0000-0000"></div>
+      <div class="field"><label for="m-hood">Bairro</label><input type="text" id="m-hood" name="neighborhood"></div>
+      <div class="field"><label for="m-city">Cidade</label><input type="text" id="m-city" name="city" value="{{ settings().default_city }}"></div>
+    </div>
+    <div class="field"><label for="m-site">Site ou rede social (se tiver)</label><input type="url" id="m-site" name="website_url" placeholder="https://"></div>
+    <datalist id="niche-list">{% for n in cat().niches %}<option value="{{ n.label }}">{% endfor %}</datalist>
+    <div class="dlg-foot"><button type="button" class="btn ghost" data-dialog-close>Cancelar</button><button class="btn primary" type="submit">Adicionar</button></div>
+  </form>
+</dialog>
+{% endblock %}
+{% block scripts %}<script src="/static/vendor/leaflet/leaflet.js"></script><script src="/static/vendor/leaflet/leaflet.markercluster.js"></script>{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Ajuda{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Ajuda</h1><p>Como usar o Radar no dia a dia.</p></div></div>
+<div class="bento">
+  <section class="card span-3 stack sm"><h2>O caminho de um lead</h2>
+    <ol class="stack sm small">
+      <li><b>1. Busca.</b> Em Buscas, escolha o tipo de negócio e o bairro (ou marque no mapa).</li>
+      <li><b>2. Nota.</b> A app dá nota A, B, C ou Descarte e explica o motivo. Você pode mudar.</li>
+      <li><b>3. Raio-X.</b> Abra o lead para ver o que falta: site, Google, contato e reputação.</li>
+      <li><b>4. Amostra.</b> Gere uma amostra de site com um clique.</li>
+      <li><b>5. Mensagem.</b> A app escreve o rascunho. Você copia, envia e marca “Marquei como enviado”.</li>
+      <li><b>6. Follow-up.</b> A tela Hoje avisa quando é dia de voltar a falar.</li>
+      <li><b>7. Proposta.</b> Monte a proposta, salve em PDF pelo navegador e envie.</li>
+    </ol></section>
+  <section class="card span-3 stack sm"><h2>Regras que a app segue</h2>
+    <ul class="stack sm small">
+      <li>• <b>Nunca envia mensagem sozinha.</b> Quem envia é sempre você.</li>
+      <li>• <b>Sem raspagem.</b> Os dados vêm do OpenStreetMap, da API oficial do Google ou do que você digita.</li>
+      <li>• <b>Limite de {{ settings().max_places_requests_per_day }} buscas por dia no Google.</b> A app trava antes de passar.</li>
+      <li>• <b>Só dados públicos do negócio.</b> “Não contatar” esconde o lead de tudo. “Excluir de vez” apaga.</li>
+      <li>• <b>Site do lead:</b> uma visita à página inicial, sem seguir links, e só se estiver ligado em Configurações.</li>
+    </ul></section>
+  <section class="card span-3 stack sm"><h2>As notas</h2>
+    <dl class="kv"><dt>A</dt><dd>Sem site próprio (ou só rede social ou plataforma), bem avaliado, funcionando, com telefone.</dd>
+      <dt>B</dt><dd>Tem potencial, mas falta algum sinal (poucas avaliações, site fraco, sem conferência).</dd>
+      <dt>C</dt><dd>Já tem site bom, ou faltam dados para abordar.</dd>
+      <dt>Descarte</dt><dd>Fechado, franquia, fora do nicho.</dd></dl>
+    <p class="small muted">O índice de oportunidade (0 a 100) ordena dentro da mesma nota.</p></section>
+  <section class="card span-3 stack sm"><h2>Leads do OpenStreetMap</h2>
+    <p class="small">O OpenStreetMap é grátis, mas não traz nota, avaliações nem fotos. Por isso o lead chega como “Google não conferido”. Abra o lead, clique em “Abrir no Maps”, olhe o perfil e anote em “Conferir no Google Maps”. A nota é recalculada na hora.</p></section>
+  <section class="card span-3 stack sm"><h2>Mandar a amostra para o cliente</h2>
+    <p class="small">A amostra fica em <code>data/previews/</code>. Para o cliente abrir, publique essa pasta no Cloudflare Pages e preencha <code>PREVIEWS_PUBLIC_URL</code> no .env. O passo a passo está em <code>docs/v3/publicar-amostras.md</code>. Comando: <code>python scripts/dev.py publish</code>.</p></section>
+  <section class="card span-3 stack sm"><h2>Arquivo .env</h2>
+    <dl class="kv small"><dt>PLACES_PROVIDER</dt><dd>osm (padrão), google ou mock</dd><dt>GOOGLE_MAPS_API_KEY</dt><dd>chave do Google, só se usar google</dd>
+      <dt>MAX_PLACES_REQUESTS_PER_DAY</dt><dd>limite diário (30)</dd><dt>DATABASE_URL</dt><dd>onde fica o banco</dd>
+      <dt>PREVIEWS_PUBLIC_URL</dt><dd>endereço público das amostras</dd><dt>GEMINI_API_KEY / GROQ_API_KEY</dt><dd>IA das mensagens (opcional)</dd>
+      <dt>APP_PASSWORD</dt><dd>senha, se a app ficar na internet</dd></dl>
+    <p class="small muted">Nunca cole chaves em mensagens, documentos ou no código.</p></section>
+  <section class="card span-6 stack sm"><h2>Atalhos</h2>
+    <p class="small">Aperte <kbd>?</kbd> em qualquer tela para ver os atalhos. <kbd>Ctrl</kbd> <kbd>K</kbd> abre a paleta de comandos.</p>
+    <button type="button" class="btn sm" data-dialog-open="#keys-dialog" style="justify-self:start">Ver atalhos</button></section>
+</div>
+{% endblock %}

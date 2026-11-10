@@ -1,0 +1,8 @@
+<div class="rec" role="status">
+  <p><b>Interesse: {{ {"alto": "alto", "medio": "médio", "baixo": "baixo", "nenhum": "nenhum"}.get(r.interest, r.interest) }}</b>{% if r.by %} <span class="chip">análise com IA</span>{% else %} <span class="chip">análise simples</span>{% endif %}</p>
+  <p class="why">{{ r.summary }}</p>
+  {% if r.reply %}<label for="conv-reply">Resposta sugerida</label><textarea class="msg" id="conv-reply" rows="4">{{ r.reply }}</textarea>
+  <div class="row"><button type="button" class="btn sm primary" data-copy="#conv-reply">Copiar</button>
+    {% if r.stage and r.stage != lead.status %}<button type="button" class="btn sm" hx-patch="/leads/{{ lead.id }}/status" hx-vals='{"status": "{{ r.stage }}"}' hx-target="#drawer-body">Mover para {{ STATUS_LABELS[r.stage] }}</button>{% endif %}
+    {% if r.do_not_contact %}<button type="button" class="btn sm danger" hx-post="/leads/{{ lead.id }}/dnc" hx-swap="none">Marcar não contatar</button>{% endif %}</div>{% endif %}
+</div>

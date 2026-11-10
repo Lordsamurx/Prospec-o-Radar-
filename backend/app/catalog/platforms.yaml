@@ -1,0 +1,71 @@
+# Domínios que NÃO contam como site próprio. Lista editável (a tela Configurações aceita extras).
+social:
+  [instagram.com, facebook.com, fb.com, fb.me, linktr.ee, linktree.com, wa.me, whatsapp.com, api.whatsapp.com, wa.link,
+   tiktok.com, beacons.ai, bio.link, bio.site, linkme.bio, lnk.bio, taplink.cc, youtube.com, x.com, twitter.com, kwai.com]
+# plataforma de terceiros: domínio -> nome que aparece na tela
+platform:
+  ifood.com.br: iFood
+  goomer.app: Goomer
+  goomer.com.br: Goomer
+  anota.ai: Anota AI
+  pedido.anota.ai: Anota AI
+  booksy.com: Booksy
+  trinks.com: Trinks
+  agendor.com.br: Agendor
+  wixsite.com: Wix (grátis)
+  sites.google.com: Google Sites
+  business.site: Google Sites
+  negocio.site: Google Sites
+  canva.site: Canva
+  my.canva.site: Canva
+  webnode.page: Webnode
+  webnode.com.br: Webnode
+  wordpress.com: WordPress.com (grátis)
+  blogspot.com: Blogspot
+  carrd.co: Carrd
+  ueniweb.com: UENI
+  rappi.com.br: Rappi
+  aiqfome.com: aiqfome
+  deliverydireto.com.br: Delivery Direto
+  menudino.com: MenuDino
+  cardapioweb.com: Cardápio Web
+  pedir.delivery: Delivery
+  instadelivery.com.br: Instadelivery
+  simplesagenda.com.br: Simples Agenda
+  agendaonline.com.br: Agenda Online
+  salao99.com.br: Salão99
+  gestaods.com.br: GestãoDS
+  doctoralia.com.br: Doctoralia
+  boaconsulta.com: BoaConsulta
+  olx.com.br: OLX
+  mercadolivre.com.br: Mercado Livre
+  mercadoshops.com.br: Mercado Shops
+  shopee.com.br: Shopee
+  enjoei.com.br: Enjoei
+  zapimoveis.com.br: ZAP Imóveis
+  vivareal.com.br: Viva Real
+  booking.com: Booking
+  airbnb.com.br: Airbnb
+  airbnb.com: Airbnb
+  tripadvisor.com.br: Tripadvisor
+  gympass.com: Gympass
+  wellhub.com: Wellhub
+  petlove.com.br: Petlove
+  hotmart.com: Hotmart
+  kyte.site: Kyte
+  yampi.io: Yampi
+  lojaintegrada.com.br: Loja Integrada
+  nuvemshop.com.br: Nuvemshop (endereço grátis)
+  lojavirtualnuvem.com.br: Nuvemshop (endereço grátis)
+  site.google.com: Google Sites
+# construtores prontos, reconhecidos no HTML quando a análise de site está ligada (4.10 item 3)
+builders:
+  Wix: ["wix.com", "wixstatic.com", "_wixCssImports"]
+  Canva: ["canva.com", "canva.site"]
+  Google Sites: ["sites.google.com", "googleusercontent.com/sites"]
+  Webnode: ["webnode"]
+  Squarespace: ["squarespace"]
+  Weebly: ["weebly.com"]
+  GoDaddy: ["godaddy.com/websites", "wsimg.com"]
+  Hostinger Builder: ["hostinger", "zyrosite"]
+  Wordpress.com: ["wp.com/"]

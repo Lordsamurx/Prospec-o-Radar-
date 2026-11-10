@@ -1,0 +1,39 @@
+{% extends "_layout.html" %}
+{% block page %}
+<nav class="top" aria-label="Seções"><div class="wrap top__in">
+  <a class="top__brand" href="#inicio">{{ name }}</a>
+  <ul class="top__links"><li><a href="#sobre">Sobre</a></li><li><a href="#servicos">Serviços</a></li><li><a href="#contato">Contato</a></li></ul>
+</div></nav>
+<header class="inst-hero" id="inicio"><div class="wrap inst-hero__grid">
+  <div>
+    <p class="eyebrow">{% if niche_label %}{{ niche_label }} · {% endif %}{{ neighborhood or city }}</p>
+    <h1 class="reveal">{{ name }}</h1>
+    <p class="lead reveal">{{ tagline }}</p>
+    <div class="cta reveal">{% if whatsapp_url %}<a class="btn btn--brand" href="{{ whatsapp_url }}" target="_blank" rel="noopener">{{ cta }}</a>{% elif phone %}<a class="btn btn--brand" href="tel:{{ phone_digits }}">Ligar: {{ phone }}</a>{% endif %}
+      <a class="btn btn--ghost" href="#servicos">Ver serviços</a></div>
+  </div>
+  <div class="inst-hero__badge reveal" aria-hidden="true"><span>{{ sector_icon }}</span></div>
+</div></header>
+<main>
+  <section class="wrap section grid2" id="sobre" aria-labelledby="h-sobre">
+    <div><h2 id="h-sobre">Sobre {{ name }}</h2>
+      <p>{{ tagline }} Atendemos {% if neighborhood %}em {{ neighborhood }} e região{% else %}{{ city or "na região" }}{% endif %} com atenção a cada cliente.</p>
+      <p class="muted">Aqui entra a história de vocês: quem são, há quanto tempo atendem e o que faz a diferença.</p></div>
+    <ul class="facts">
+      {% if rating %}<li><b>{{ rating_text }}</b><span>nota no Google</span></li><li><b>{{ reviews_count }}</b><span>avaliações de clientes</span></li>{% endif %}
+      <li><b>{{ services|length }}</b><span>frentes de atendimento</span></li>
+    </ul>
+  </section>
+  <section class="soft" id="servicos" aria-labelledby="h-serv"><div class="wrap section">
+    <h2 id="h-serv">Serviços</h2>
+    <ul class="cards">{% for s in services %}<li class="card card--white reveal"><span class="card__icon" aria-hidden="true">{{ s.icon }}</span><h3>{{ s.title }}</h3><p>{{ s.text }}</p></li>{% endfor %}</ul>
+  </div></section>
+  <section class="wrap section grid2" id="contato" aria-labelledby="h-cont">
+    <div><h2 id="h-cont">Contato</h2><p>{{ address or (neighborhood or city) }}</p>
+      {% if phone %}<p>Telefone: <a href="tel:{{ phone_digits }}">{{ phone }}</a></p>{% endif %}
+      <div class="cta">{% if whatsapp_url %}<a class="btn btn--brand" href="{{ whatsapp_url }}" target="_blank" rel="noopener">{{ cta }}</a>{% endif %}
+        {% if maps_url %}<a class="btn btn--ghost" href="{{ maps_url }}" target="_blank" rel="noopener">Como chegar</a>{% endif %}</div></div>
+    <div><h2>Horário</h2>{% if hours %}<ul class="hours">{% for h in hours %}<li>{{ h }}</li>{% endfor %}</ul>{% else %}<p>Consulte pelo WhatsApp.</p>{% endif %}</div>
+  </section>
+</main>
+{% endblock %}

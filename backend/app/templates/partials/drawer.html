@@ -1,0 +1,237 @@
+{% from "_macros.html" import icon, score, status %}
+{% set d = ins.diag %}
+<div class="dw-head">
+  <div class="row nowrap" style="align-items:flex-start">
+    {{ score(lead.score, true) }}
+    <div class="grow">
+      <h2 id="dw-title" tabindex="-1">{{ lead.name }}</h2>
+      <p class="small muted">{{ ins.sector.icon }} {{ ins.niche.label }}{% if lead.neighborhood %} · {{ lead.neighborhood }}{% endif %}{% if lead.city %} · {{ lead.city }}{% endif %}</p>
+    </div>
+    <button type="button" class="icon-btn" data-drawer-close aria-label="Fechar painel do lead">{{ icon("x") }}</button>
+  </div>
+  <div class="row">
+    <span id="dw-status">{{ status(lead) }}</span>
+    {% if lead.profile in PROFILES %}<span class="chip" title="{{ ins.profile_reason }}">{{ PROFILES[lead.profile][1] }} {{ PROFILES[lead.profile][0] }}</span>{% endif %}
+    {% if lead.is_mock %}<span class="chip info">Fictício</span>{% endif %}
+    {% if lead.do_not_contact %}<span class="chip ruim">Não contatar</span>{% endif %}
+    {% if lead.archived %}<span class="chip">Arquivado</span>{% endif %}
+    {% if stale %}<span class="chip atencao">Dados com mais de 30 dias</span>{% endif %}
+  </div>
+  <p class="small">{{ lead.score_reason }}{% if lead.score_manual %} <span class="muted">(nota manual; a automática seria {{ lead.score_auto }})</span>{% endif %}</p>
+  {% if lead.next_action %}<p class="small"><b>Próxima ação:</b> {{ lead.next_action }}{% if lead.next_action_at %} · <span class="{{ 'chip ruim' if lead.next_action_at <= now else '' }}">{{ lead.next_action_at|day }}</span>{% endif %}</p>{% endif %}
+</div>
+
+{% if not lead.do_not_contact %}
+<section class="dw-sec" aria-labelledby="dw-h-act">
+  <h3 id="dw-h-act" class="sr-only">Ações</h3>
+  <div class="dw-actions">
+    <button class="btn primary" type="button" hx-post="/leads/{{ lead.id }}/site" hx-target="#site-result" hx-swap="innerHTML">Gerar amostra de site</button>
+    <a class="btn" href="/leads/{{ lead.id }}/proposta" target="_blank" rel="noopener">Montar proposta {{ icon("ext") }}</a>
+    <a class="btn" href="/leads/{{ lead.id }}/diagnostico" target="_blank" rel="noopener">Diagnóstico em PDF {{ icon("ext") }}</a>
+    {% if lead.maps_url %}<a class="btn" href="{{ lead.maps_url }}" target="_blank" rel="noopener noreferrer">Ver no Maps {{ icon("ext") }}</a>{% endif %}
+    {% if lead.phone_type == "mobile" %}<a class="btn" href="{{ whatsapp_link(lead.phone) }}" target="_blank" rel="noopener noreferrer">WhatsApp {{ icon("ext") }}</a>{% endif %}
+    {% if lead.website_url %}<a class="btn" href="{{ lead.website_url }}" target="_blank" rel="noopener noreferrer nofollow">Ver site {{ icon("ext") }}</a>{% endif %}
+  </div>
+  <form class="row" hx-post="/leads/{{ lead.id }}/site" hx-target="#site-result" hx-swap="innerHTML">
+    <label class="sr-only" for="dw-tpl">Modelo da amostra</label>
+    <select id="dw-tpl" name="template" style="width:auto;flex:1">
+      {% for k, v in TEMPLATE_LABELS.items() %}<option value="{{ k }}" {{ 'selected' if k == sample_template }}>{{ v }}{{ ' (sugerido)' if k == sample_template }}</option>{% endfor %}
+    </select>
+    <button class="btn sm" type="submit">Gerar com este modelo</button>
+  </form>
+  <div id="site-result">{% if lead.latest_site %}{% set site = lead.latest_site %}{% set local = settings().preview_link_is_local %}{% include "partials/site_result.html" %}{% endif %}</div>
+</section>
+
+<section class="dw-sec" aria-labelledby="dw-h-msg">
+  <h3 id="dw-h-msg">Mensagem</h3>
+  <p class="small muted">A app só escreve o rascunho. Quem envia é você.</p>
+  <form class="form-grid" hx-post="/leads/{{ lead.id }}/outreach" hx-target="#outreach-result" hx-swap="innerHTML">
+    <div class="field"><label for="dw-ch">Canal</label><select id="dw-ch" name="channel">
+      {% for k, v in CHANNELS.items() %}<option value="{{ k }}" {{ 'selected' if (k == 'whatsapp' and lead.phone_type == 'mobile') or (k == 'ligacao' and lead.phone_type == 'landline') }}>{{ v }}</option>{% endfor %}</select></div>
+    <div class="field"><label for="dw-kind">Tipo</label><select id="dw-kind" name="kind">
+      {% set suggested = 'followup' ~ ([lead.followup_step + 1, 3]|min) if lead.status in ('ABORDADO', 'FOLLOWUP') else 'primeira' %}
+      {% for k, v in KINDS.items() %}<option value="{{ k }}" {{ 'selected' if k == suggested }}>{{ v }}</option>{% endfor %}</select></div>
+    {% if ai_on %}<label class="check"><input type="checkbox" name="ai" value="1"> Deixar mais natural com IA</label>{% endif %}
+    <button class="btn" type="submit">Escrever rascunho <span class="spinner htmx-indicator" aria-hidden="true"></span></button>
+  </form>
+  <div id="outreach-result">
+    {% set last = lead.drafts[0] if lead.drafts else none %}
+    {% if last %}{% set draft = last %}{% set wa = whatsapp_link(lead.phone, last.text) if last.channel == 'whatsapp' else none %}{% set has_site = lead.latest_site is not none %}{% set local = has_site and settings().preview_link_is_local %}{% set channel = last.channel %}{% set kind = last.kind %}{% include "partials/outreach.html" %}{% endif %}
+  </div>
+</section>
+{% endif %}
+
+<section class="dw-sec" aria-labelledby="dw-h-x">
+  <h3 id="dw-h-x">Raio-X</h3>
+  <div class="xray">
+    {% set circ = 326.7 %}
+    <svg class="ring" viewBox="0 0 120 120" role="img" aria-label="Índice de oportunidade: {{ ins.opportunity }} de 100">
+      <circle class="track" cx="60" cy="60" r="52" fill="none" stroke-width="10"/>
+      <circle class="value" cx="60" cy="60" r="52" fill="none" stroke-width="10" stroke-linecap="round" transform="rotate(-90 60 60)"
+              stroke-dasharray="{{ circ }}" stroke-dashoffset="{{ (circ * (100 - ins.opportunity) / 100)|round(1) }}"/>
+      <text x="60" y="64" text-anchor="middle">{{ ins.opportunity }}</text><text class="cap" x="60" y="82" text-anchor="middle">OPORTUNIDADE</text>
+    </svg>
+    <div class="dims">
+      {% for key, label in [("site", "Site"), ("google", "Google"), ("contato", "Contato"), ("reputacao", "Reputação")] %}
+      {% set v = d.dims.get(key) %}
+      <div class="dim"><span>{{ label }}</span>
+        <span class="meter {{ 'danger' if v is not none and v < 40 else ('warn' if v is not none and v < 70 else '') }}" role="img" aria-label="{{ label }}: {{ v ~ ' de 100' if v is not none else 'não conferido' }}"><i style="--v: {{ v or 0 }}%"></i></span>
+        <span class="v">{{ v if v is not none else '?' }}</span></div>
+      {% endfor %}
+      <p class="xs muted">Barras: saúde de cada ponto (100 é ótimo). O anel mede a oportunidade de venda.</p>
+    </div>
+  </div>
+  <ul class="signals">
+    {% for s in d.signals %}
+    <li class="signal"><span class="chip {{ s.tone }}">{{ s.value }}</span><span>{{ s.phrase }}</span></li>
+    {% endfor %}
+  </ul>
+  <details class="disclosure"><summary>Como o índice foi calculado</summary>
+    <table class="table"><caption class="sr-only">Parcelas do índice de oportunidade</caption>
+      <thead><tr><th scope="col">Parcela</th><th scope="col" class="n">Pontos</th><th scope="col">Por quê</th></tr></thead>
+      <tbody>{% for p in ins.parcels %}<tr><th scope="row">{{ p.label }}</th><td class="n">{{ p.points }}{% if p.cap %} / {{ p.cap }}{% endif %}</td><td>{{ p.why }}</td></tr>{% endfor %}</tbody>
+    </table>
+  </details>
+  {% if lead.site_status == "own" and lead.website_url %}
+  <div class="row">
+    {% if not (lead.site_check and lead.site_check.checked) %}
+    <button class="btn sm" type="button" hx-post="/leads/{{ lead.id }}/site-check" hx-target="#drawer-body">Checar o site <span class="spinner htmx-indicator" aria-hidden="true"></span></button>
+    <span class="small muted">Uma visita ao site do próprio negócio{{ ', lendo só a página inicial' if ctx.site_analysis }}.</span>
+    {% else %}
+    <span class="small muted">Site checado em {{ lead.site_check.at[:10] if lead.site_check.at else '—' }}{% if lead.site_check.elapsed_ms %} · abriu em {{ '%.1f'|format(lead.site_check.elapsed_ms / 1000)|replace('.', ',') }} s{% endif %}.</span>
+    <button class="btn sm ghost" type="button" hx-post="/leads/{{ lead.id }}/site-check?force=1" hx-target="#drawer-body" hx-confirm="Checar o site de novo?">Checar de novo</button>
+    {% endif %}
+  </div>
+  {% if d.site_has %}<p class="small"><b>A página inicial tem:</b> {{ d.site_has|join(", ") }}.</p>{% endif %}
+  {% endif %}
+</section>
+
+{% if d.from_osm or lead.source_provider == "manual" %}
+<section class="dw-sec" aria-labelledby="dw-h-gmb">
+  <h3 id="dw-h-gmb">Conferir no Google Maps</h3>
+  <p class="small muted">{% if lead.gmb_check and lead.gmb_check.checked %}Conferido por você em {{ lead.gmb_check.at[:10] }}. Pode corrigir abaixo.{% else %}Esta fonte não traz nota nem avaliações. Abra o Maps, olhe o perfil e anote aqui. Leva um minuto e melhora a nota do lead.{% endif %}</p>
+  {% set g = lead.gmb_check or {} %}
+  <form class="stack sm" hx-post="/leads/{{ lead.id }}/gmb-check" hx-target="#drawer-body">
+    <div class="form-grid">
+      <div class="field"><label for="g-ex">Aparece no Google?</label><select id="g-ex" name="exists"><option value="yes">Sim</option><option value="no" {{ 'selected' if g.checked and not g.exists }}>Não aparece</option></select></div>
+      <div class="field"><label for="g-ra">Nota</label><input type="text" inputmode="decimal" id="g-ra" name="rating" value="{{ ('%g'|format(g.rating))|replace('.', ',') if g.rating is not none and g.rating is defined else '' }}" placeholder="4,6"></div>
+      <div class="field"><label for="g-rv">Avaliações</label><input type="number" min="0" id="g-rv" name="reviews" value="{{ g.reviews if g.checked else '' }}"></div>
+      <div class="field"><label for="g-ph">Fotos</label><input type="number" min="0" id="g-ph" name="photos" value="{{ g.photos if g.checked else '' }}"></div>
+    </div>
+    <label class="check"><input type="checkbox" name="hours" value="1" {{ 'checked' if g.hours }}> Tem horário de funcionamento</label>
+    <div class="form-grid">
+      <div class="field"><label for="g-tel">Telefone (se achou)</label><input type="tel" id="g-tel" name="phone" value="{{ lead.phone or '' }}"></div>
+      <div class="field"><label for="g-site">Site (se achou)</label><input type="url" id="g-site" name="website_url" value="{{ lead.website_url or '' }}" placeholder="https://"></div>
+    </div>
+    <div class="row"><button class="btn sm primary" type="submit">Salvar o que vi</button>
+      {% if lead.maps_url %}<a class="btn sm" href="{{ lead.maps_url }}" target="_blank" rel="noopener noreferrer">Abrir no Maps {{ icon("ext") }}</a>{% endif %}</div>
+  </form>
+</section>
+{% endif %}
+
+<section class="dw-sec" aria-labelledby="dw-h-rec">
+  <h3 id="dw-h-rec">O que oferecer</h3>
+  {% if ins.recs %}
+  <form class="stack sm" hx-post="/leads/{{ lead.id }}/offered" hx-target="#drawer-body">
+    {% for r in ins.recs %}
+    <div class="rec {{ r.priority }}">
+      <label class="check" style="min-height:0"><input type="checkbox" name="services" value="{{ r.key }}" {{ 'checked' if (r.key in (lead.offered or [])) or (not lead.offered and r.priority != 'upsell') }}>
+        <b>{{ r.name }}</b> <span class="chip">{{ PRIORITY_LABELS[r.priority] }}</span> <span class="small muted right">{{ r.price_text }}</span></label>
+      <p class="why">{{ r.reason }}</p>
+    </div>
+    {% endfor %}
+    <div class="row between"><p class="small"><b>Pacote:</b> {{ ins.package.total_text }}</p><button class="btn sm" type="submit">Salvar escolha</button></div>
+  </form>
+  {% else %}<p class="muted small">Nenhum serviço ativo combina com este lead.</p>{% endif %}
+</section>
+
+<section class="dw-sec" aria-labelledby="dw-h-st">
+  <h3 id="dw-h-st">Como abordar: {{ ins.strategy.title }}</h3>
+  <p>{{ ins.strategy.angle }}</p>
+  {% if ins.strategy.hooks %}<ul class="stack sm small">{% for h in ins.strategy.hooks %}<li>• {{ h }}</li>{% endfor %}</ul>{% endif %}
+  {% if ins.strategy.objections %}
+  <details class="disclosure"><summary>Se disserem que…</summary>
+    <dl class="stack sm small">{% for q, a in ins.strategy.objections %}<div><dt><b>“{{ q }}”</b></dt><dd style="margin:0">{{ a }}</dd></div>{% endfor %}</dl>
+  </details>{% endif %}
+  <p class="small"><b>Próximo passo:</b> {{ ins.strategy.next_step }}</p>
+</section>
+
+<section class="dw-sec" aria-labelledby="dw-h-stage">
+  <h3 id="dw-h-stage">Etapa e nota</h3>
+  <div class="form-grid">
+    <div class="field"><label for="dw-stage">Etapa do funil</label>
+      <select id="dw-stage" data-stage-select="{{ lead.id }}" data-name="{{ lead.name }}" data-view="drawer" {{ 'disabled' if lead.do_not_contact }}>
+        {% for s in STATUSES %}<option value="{{ s }}" {{ 'selected' if s == lead.status }}>{{ STATUS_LABELS[s] }}</option>{% endfor %}</select></div>
+    <div class="field"><span class="label" id="dw-score-l">Nota</span>
+      <div class="seg" role="group" aria-labelledby="dw-score-l">
+        {% for s in ["A", "B", "C", "DESCARTE"] %}<button type="button" aria-pressed="{{ 'true' if lead.score == s else 'false' }}" hx-patch="/leads/{{ lead.id }}/score" hx-vals='{"score": "{{ s }}"}' hx-target="#drawer-body">{{ 'Descarte' if s == 'DESCARTE' else s }}</button>{% endfor %}
+        {% if lead.score_manual %}<button type="button" hx-patch="/leads/{{ lead.id }}/score" hx-vals='{"score": "auto"}' hx-target="#drawer-body">Automática</button>{% endif %}
+      </div></div>
+  </div>
+  {% if lead.status == "PERDIDO" and lead.lost_reason %}<p class="small muted">Motivo da perda: {{ LOST_REASONS.get(lead.lost_reason, lead.lost_reason) }}.</p>{% endif %}
+  {% if lead.proposal_value or lead.recurring_value %}<p class="small">Valor: <b>{{ lead.proposal_value|money }}</b>{% if lead.recurring_value %} + {{ lead.recurring_value|money }} por mês{% endif %}</p>{% endif %}
+  <form class="form-grid" hx-post="/leads/{{ lead.id }}/next-action" hx-target="#drawer-body">
+    <div class="field"><label for="dw-na">Próxima ação</label><input type="text" id="dw-na" name="label" value="{{ lead.next_action or '' }}" maxlength="200"></div>
+    <div class="field"><label for="dw-nad">Quando</label><input type="date" id="dw-nad" name="date" value="{{ lead.next_action_at.strftime('%Y-%m-%d') if lead.next_action_at else '' }}"></div>
+    <button class="btn sm" type="submit">Salvar ação</button>
+  </form>
+</section>
+
+<section class="dw-sec" aria-labelledby="dw-h-tags">
+  <h3 id="dw-h-tags">Tags e observações</h3>
+  <div class="row">
+    {% for t in lead.tag_list %}<button type="button" class="chip accent" hx-post="/leads/{{ lead.id }}/tags" hx-vals='{{ {"remove": t}|tojson }}' hx-target="#drawer-body" aria-label="Tirar a tag {{ t }}">#{{ t }} <span class="x" aria-hidden="true">×</span></button>{% endfor %}
+    <form class="row nowrap" hx-post="/leads/{{ lead.id }}/tags" hx-target="#drawer-body">
+      <label class="sr-only" for="dw-tag">Nova tag</label><input type="text" id="dw-tag" name="add" placeholder="nova tag" maxlength="30" style="width:9rem" required>
+      <button class="btn sm" type="submit">Pôr tag</button></form>
+  </div>
+  <form class="stack sm" hx-post="/leads/{{ lead.id }}/notes" hx-target="#drawer-body">
+    <label for="dw-notes">Observações</label><textarea id="dw-notes" name="notes" maxlength="4000" rows="3">{{ lead.notes or '' }}</textarea>
+    <div><button class="btn sm" type="submit">Salvar observações</button></div>
+  </form>
+</section>
+
+{% if not lead.do_not_contact %}
+<section class="dw-sec" aria-labelledby="dw-h-conv">
+  <h3 id="dw-h-conv">Analisar conversa</h3>
+  <p class="small muted">Cole aqui a conversa. A app não lê seu WhatsApp: só o texto que você colar.</p>
+  <form class="stack sm" hx-post="/leads/{{ lead.id }}/conversation" hx-target="#conv-result" hx-swap="innerHTML">
+    <label class="sr-only" for="dw-conv">Texto da conversa</label><textarea id="dw-conv" name="text" rows="4" maxlength="8000" required placeholder="Cole a conversa aqui"></textarea>
+    <div><button class="btn sm" type="submit">Analisar <span class="spinner htmx-indicator" aria-hidden="true"></span></button></div>
+  </form>
+  <div id="conv-result" aria-live="polite"></div>
+</section>
+{% endif %}
+
+<section class="dw-sec" aria-labelledby="dw-h-data">
+  <h3 id="dw-h-data">Dados do negócio</h3>
+  <dl class="kv">
+    <dt>Endereço</dt><dd>{{ lead.address or '—' }}</dd>
+    <dt>Telefone</dt><dd>{% if lead.phone %}<span id="dw-phone">{{ lead.phone }}</span> <span class="muted">({{ 'celular' if lead.phone_type == 'mobile' else 'fixo' }})</span>
+      <button type="button" class="chip" data-copy="#dw-phone">Copiar</button>{% else %}—{% endif %}</dd>
+    <dt>Site</dt><dd>{% if lead.website_url %}<a href="{{ lead.website_url }}" target="_blank" rel="noopener noreferrer nofollow">{{ lead.website_url }}</a>{% else %}não tem{% endif %}</dd>
+    <dt>Google</dt><dd>{% if d.rating is not none %}{{ d.rating|stars }} com {{ d.reviews }} avaliações{% elif d.google_known %}sem nota{% else %}não conferido{% endif %}{% if d.photos is not none %} · {{ d.photos }} fotos{% endif %}</dd>
+    <dt>Horário</dt><dd>{{ (lead.opening_hours or '—')|replace('\n', '; ') }}</dd>
+    <dt>Origem</dt><dd>{{ PROVIDER_LABELS.get(lead.source_provider, 'digitado por você' if lead.source_provider == 'manual' else lead.source_provider) }} · visto em {{ lead.fetched_at|date }}</dd>
+  </dl>
+  {% if lead.source_provider == "google" %}
+  <div><button class="btn sm" type="button" hx-post="/leads/{{ lead.id }}/refresh" hx-target="#drawer-body" hx-confirm="Atualizar os dados no Google? Usa 1 busca do limite de hoje.">Atualizar no Google (usa 1 busca)</button></div>
+  {% endif %}
+</section>
+
+<section class="dw-sec" aria-labelledby="dw-h-hist">
+  <h3 id="dw-h-hist">Histórico</h3>
+  {% if lead.events %}<ol class="timeline">
+    {% for e in lead.events[:30] %}<li><span class="muted xs">{{ e.created_at|dt }}</span><br>
+      {% if e.type == "status" %}<b>{{ STATUS_LABELS.get(e.from_status, e.from_status or '—') }} → {{ STATUS_LABELS.get(e.to_status, e.to_status) }}</b>{% if e.note %} · {{ e.note }}{% endif %}{% else %}{{ e.note }}{% endif %}</li>{% endfor %}
+  </ol>{% else %}<p class="muted small">Nada registrado ainda.</p>{% endif %}
+</section>
+
+<section class="dw-sec" aria-labelledby="dw-h-lgpd">
+  <h3 id="dw-h-lgpd">Privacidade</h3>
+  <p class="small muted">Só guardamos dados públicos do negócio. Se pedirem para parar ou apagar, use os botões abaixo.</p>
+  <div class="row">
+    {% if not lead.do_not_contact %}<button class="btn sm" type="button" hx-post="/leads/{{ lead.id }}/dnc" hx-swap="none" hx-confirm="Marcar como não contatar? O lead some de todas as telas e fica bloqueado para amostra e mensagem.">Não contatar</button>{% endif %}
+    <button class="btn sm danger" type="button" hx-post="/leads/{{ lead.id }}/delete" hx-vals='{"confirm": "sim"}' hx-swap="none" hx-confirm="Excluir este lead de vez? Não dá para desfazer.">Excluir de vez</button>
+  </div>
+</section>

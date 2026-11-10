@@ -1,0 +1,35 @@
+{% extends "_layout.html" %}
+{% block page %}
+<header class="book-hero"><div class="wrap book-hero__grid">
+  <div>
+    <p class="eyebrow">{% if niche_label %}{{ niche_label }} · {% endif %}{{ neighborhood or city }}</p>
+    <h1 class="reveal">{{ name }}</h1>
+    {% if rating %}<p class="rating reveal"><span aria-hidden="true">★</span> {{ rating_text }} no Google · {{ reviews_count }} avaliações</p>{% endif %}
+    <p class="lead reveal">{{ tagline }} Escolha o serviço e peça seu horário em um minuto.</p>
+  </div>
+  <form class="book reveal" data-booking data-wa="{{ wa_number }}" data-tel="{{ phone_digits }}" aria-labelledby="h-book">
+    <h2 id="h-book">Pedir horário</h2>
+    <fieldset><legend>Qual serviço?</legend>
+      {% for s in services %}<label class="opt"><input type="radio" name="servico" value="{{ s.title }}" {{ 'checked' if loop.first }}> <span aria-hidden="true">{{ s.icon }}</span> {{ s.title }}</label>{% endfor %}
+    </fieldset>
+    <div class="row2">
+      <div><label for="b-dia">Dia</label><input type="date" id="b-dia" name="dia"></div>
+      <div><label for="b-per">Período</label><select id="b-per" name="periodo"><option>Manhã</option><option>Tarde</option><option>Noite</option></select></div>
+    </div>
+    <div><label for="b-nome">Seu nome</label><input type="text" id="b-nome" name="nome" autocomplete="given-name"></div>
+    <button type="submit" class="btn btn--brand">{% if wa_number %}Pedir horário no WhatsApp{% else %}Ligar para agendar{% endif %}</button>
+    <p class="fine">O pedido abre no WhatsApp. O horário é confirmado por lá.</p>
+  </form>
+</div></header>
+<main>
+  <section class="wrap section" aria-labelledby="h-serv">
+    <h2 id="h-serv">Serviços</h2>
+    <ul class="cards">{% for s in services %}<li class="card reveal"><span class="card__icon" aria-hidden="true">{{ s.icon }}</span><h3>{{ s.title }}</h3><p>{{ s.text }}</p></li>{% endfor %}</ul>
+  </section>
+  <section class="wrap section grid2" aria-labelledby="h-onde">
+    <div><h2 id="h-onde">Onde estamos</h2><p>{{ address or (neighborhood or city) }}</p>{% if phone %}<p>Telefone: <a href="tel:{{ phone_digits }}">{{ phone }}</a></p>{% endif %}
+      {% if maps_url %}<p><a href="{{ maps_url }}" target="_blank" rel="noopener">Como chegar</a></p>{% endif %}</div>
+    <div><h2>Horário</h2>{% if hours %}<ul class="hours">{% for h in hours %}<li>{{ h }}</li>{% endfor %}</ul>{% else %}<p>Consulte pelo WhatsApp.</p>{% endif %}</div>
+  </section>
+</main>
+{% endblock %}

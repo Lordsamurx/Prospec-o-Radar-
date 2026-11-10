@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% from "_macros.html" import radar %}
+{% block title %}Erro {{ code }}{% endblock %}
+{% block content %}
+<section class="card empty">
+  {{ radar() }}
+  <h1>{% if code == 404 %}Não achamos esta página{% else %}Algo deu errado{% endif %}</h1>
+  <p>{{ message }}</p>
+  <a class="btn primary" href="/">Voltar para Hoje</a>
+</section>
+{% endblock %}

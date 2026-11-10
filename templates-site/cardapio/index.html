@@ -1,0 +1,34 @@
+{% extends "_layout.html" %}
+{% block page %}
+<header class="menu-hero"><div class="wrap">
+  <p class="eyebrow">Cardápio digital · {{ neighborhood or city }}</p>
+  <h1>{{ name }}</h1>
+  {% if rating %}<p class="rating"><span aria-hidden="true">★</span> {{ rating_text }} no Google · {{ reviews_count }} avaliações</p>{% endif %}
+  <p class="lead">Monte o pedido aqui e mande direto no nosso WhatsApp. Sem aplicativo e sem taxa.</p>
+</div></header>
+<main class="wrap section" data-menu data-wa="{{ wa_number }}" data-tel="{{ phone_digits }}">
+  <h2 id="h-menu">Cardápio</h2>
+  <p class="note">Itens de exemplo. Na versão final entram os pratos, fotos e preços de vocês.</p>
+  <ul class="menu" aria-labelledby="h-menu">
+    {% for s in services %}
+    <li class="item reveal" data-item="{{ s.title }}">
+      <span class="item__icon" aria-hidden="true">{{ s.icon }}</span>
+      <div class="item__txt"><h3>{{ s.title }}</h3><p>{{ s.text }}</p></div>
+      <div class="qty" role="group" aria-label="Quantidade de {{ s.title }}">
+        <button type="button" data-step="-1" aria-label="Tirar um {{ s.title }}">−</button>
+        <span data-qty aria-live="polite">0</span>
+        <button type="button" data-step="1" aria-label="Pôr um {{ s.title }}">+</button>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  <div class="order">
+    <p data-order-count role="status">Nenhum item no pedido</p>
+    <button type="button" class="btn btn--brand" data-order-send disabled>{% if wa_number %}Enviar pedido no WhatsApp{% else %}Ligar para pedir{% endif %}</button>
+  </div>
+  <section class="grid2 info" aria-label="Informações">
+    <div><h2>Onde estamos</h2><p>{{ address or (neighborhood or city) }}</p>{% if maps_url %}<p><a href="{{ maps_url }}" target="_blank" rel="noopener">Como chegar</a></p>{% endif %}</div>
+    <div><h2>Horário</h2>{% if hours %}<ul class="hours">{% for h in hours %}<li>{{ h }}</li>{% endfor %}</ul>{% else %}<p>Consulte pelo WhatsApp.</p>{% endif %}</div>
+  </section>
+</main>
+{% endblock %}

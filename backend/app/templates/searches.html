@@ -1,0 +1,74 @@
+{% extends "base.html" %}{% from "_macros.html" import icon %}
+{% block title %}Buscas{% endblock %}
+{% block head %}<link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css">{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Buscas</h1>
+  <p>{% if quota.limited %}Fonte: Google Places. Hoje: {{ quota.used_today }} de {{ quota.limit }} buscas. No mês: {{ quota.used_month }}.{% elif provider == "mock" %}Fonte: dados fictícios, para demonstração.{% else %}Fonte: OpenStreetMap (grátis). Não traz nota nem avaliações: você confere no Maps.{% endif %}</p></div></div>
+{% if quota.blocked %}<p class="banner danger" role="alert">O limite de {{ quota.limit }} buscas no Google de hoje acabou. Volta à meia-noite. Buscas já feitas continuam valendo.</p>{% endif %}
+
+<div class="bento">
+  <section class="card pad-lg span-3 stack" aria-labelledby="h-new">
+    <h2 id="h-new">Nova busca</h2>
+    <form class="stack" hx-post="/buscas" hx-target="#search-result" hx-swap="innerHTML" hx-indicator="#search-spin">
+      <div class="field"><label for="search-niche">O que procurar</label>
+        <input type="text" id="search-niche" name="niche" required minlength="2" maxlength="120" list="niches" placeholder="barbearia, pizzaria, dentista..." autocomplete="off">
+        <datalist id="niches">{% for n in cat().niches %}<option value="{{ n.label }}">{% endfor %}</datalist>
+        <p class="hint">Escolha da lista ou escreva do seu jeito. São {{ cat().niches|length }} nichos em {{ cat().sectors|length }} setores.</p></div>
+      <div class="form-grid">
+        <div class="field"><label for="search-loc">Onde</label><input type="text" id="search-loc" name="location" maxlength="200" list="hoods" placeholder="Savassi, {{ default_city }}">
+          <datalist id="hoods">{% for b in neighborhoods %}<option value="{{ b }}, {{ default_city }}">{% endfor %}</datalist></div>
+        <div class="field"><label for="search-radius">Raio (km)</label><input type="text" inputmode="decimal" id="search-radius" name="radius_km" placeholder="1,5"></div>
+      </div>
+      <input type="hidden" id="search-lat" name="lat"><input type="hidden" id="search-lng" name="lng">
+      <div class="row"><button class="btn primary" type="submit" {{ 'disabled' if quota.blocked }}>{{ icon("buscas") }} Buscar</button>
+        <span id="search-spin" class="htmx-indicator row"><span class="spinner" aria-hidden="true"></span> Procurando…</span></div>
+    </form>
+    <div id="search-result" aria-live="polite"></div>
+  </section>
+  <section class="card span-3 stack sm" aria-labelledby="h-map">
+    <h2 id="h-map">Ou marque no mapa</h2>
+    <div id="search-map" class="map sm" data-center='{{ center|list|tojson }}' role="application" aria-label="Mapa para marcar o centro da busca"></div>
+    <div class="row between"><p class="small muted" id="pin-info">Clique no mapa para marcar o centro da busca.</p><button type="button" class="btn sm ghost" id="pins-clear">Tirar pinos</button></div>
+    <p class="xs muted">Sem mouse? Escreva o bairro no campo “Onde”: dá o mesmo resultado.</p>
+  </section>
+
+  <section class="card span-6 stack" id="fila" aria-labelledby="h-batch">
+    <h2 id="h-batch">Busca em lote</h2>
+    <p class="small muted">Monte várias buscas de uma vez. Elas entram numa fila e rodam uma a uma{{ ', respeitando o limite do dia' if quota.limited }}.</p>
+    <form class="stack" hx-post="/buscas/lote" hx-target="#queue" hx-swap="innerHTML">
+      <div class="form-grid" style="align-items:start">
+        <div class="field"><label for="b-lines">Uma busca por linha</label><textarea id="b-lines" name="lines" rows="5" placeholder="pizzaria em Savassi&#10;barbearia em Funcionários&#10;pet shop em Buritis"></textarea></div>
+        <fieldset><legend>Ou cruze nichos e bairros</legend>
+          <div class="form-grid">
+            <div class="field"><label for="b-niches">Nichos</label><select id="b-niches" name="niches" multiple size="6">
+              {% for sector, niches in cat().by_sector() %}<optgroup label="{{ sector.label }}">{% for n in niches if not n.is_other %}<option value="{{ n.key }}">{{ n.label }}</option>{% endfor %}</optgroup>{% endfor %}</select></div>
+            <div class="field"><label for="b-hoods">Bairros</label><select id="b-hoods" name="neighborhoods" multiple size="6">
+              {% for b in neighborhoods %}<option>{{ b }}</option>{% endfor %}</select></div>
+          </div>
+          <p class="hint">Segure Ctrl para marcar mais de um. Com pinos no mapa, os nichos marcados também rodam em cada pino.</p>
+        </fieldset>
+      </div>
+      <input type="hidden" id="batch-pins" name="pins"><input type="hidden" name="city" value="{{ default_city }}">
+      <div><button class="btn" type="submit">Pôr na fila</button></div>
+    </form>
+    <div id="queue" aria-live="polite">{% include "partials/queue.html" %}</div>
+  </section>
+
+  <section class="card span-6 stack" aria-labelledby="h-hist">
+    <h2 id="h-hist">Histórico</h2>
+    {% if history %}
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th scope="col">Quando</th><th scope="col">Busca</th><th scope="col">Onde</th><th scope="col">Fonte</th><th scope="col" class="n">Achados</th><th scope="col" class="n">Novos</th><th scope="col"><span class="sr-only">Ações</span></th></tr></thead>
+      <tbody>{% for s in history %}<tr>
+        <td class="nowrap">{{ s.created_at|dt }}</td><td>{{ s.niche }}</td><td>{{ s.location_text }}{% if s.radius_m %} <span class="muted">({{ '%g'|format(s.radius_m / 1000)|replace('.', ',') }} km)</span>{% endif %}</td>
+        <td>{{ PROVIDER_LABELS.get(s.provider, s.provider) }}{% if s.cached_from_id %} <span class="chip">do cache</span>{% endif %}</td>
+        <td class="n">{{ s.results_count }}</td><td class="n">{{ s.new_count }}</td>
+        <td class="nowrap">{% if s.error %}<span class="chip ruim" title="{{ s.error }}">Falhou</span>{% endif %}
+          <a class="btn sm ghost" href="/leads?niche={{ s.niche_key or '' }}">Ver leads</a>
+          <button class="btn sm ghost" type="button" hx-post="/buscas/{{ s.id }}/repetir" hx-target="#search-result" hx-swap="innerHTML show:#search-result:top">Repetir</button></td>
+      </tr>{% endfor %}</tbody></table></div>
+    {% else %}<p class="muted">Nenhuma busca ainda. A primeira leva alguns segundos.</p>{% endif %}
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}<script src="/static/vendor/leaflet/leaflet.js"></script>{% endblock %}

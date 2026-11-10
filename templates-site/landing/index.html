@@ -1,0 +1,26 @@
+{% extends "_layout.html" %}
+{% block page %}
+<header class="hero">
+  <div class="hero__shape" aria-hidden="true"></div>
+  <div class="wrap">
+    <p class="eyebrow">{% if niche_label %}{{ niche_label }} · {% endif %}{{ neighborhood or city }}</p>
+    <h1 class="reveal">{{ name }}</h1>
+    {% if rating %}<p class="rating reveal"><span aria-hidden="true">★</span> {{ rating_text }} no Google · {{ reviews_count }} avaliações</p>{% endif %}
+    <p class="lead reveal">{{ tagline }}{% if neighborhood %} Em {{ neighborhood }}.{% endif %}</p>
+    <div class="cta reveal">{% include "_cta.html" %}</div>
+  </div>
+</header>
+<main>
+  <section class="wrap section" aria-labelledby="servicos">
+    <h2 id="servicos">O que fazemos</h2>
+    <ul class="cards">{% for s in services %}<li class="card reveal"><span class="card__icon" aria-hidden="true">{{ s.icon }}</span><h3>{{ s.title }}</h3><p>{{ s.text }}</p></li>{% endfor %}</ul>
+  </section>
+  {% if rating and reviews_count %}
+  <section class="band" aria-label="Avaliações"><div class="wrap reveal"><p class="band__big">{{ rating_text }}<small>/5</small></p><p>Nota média de {{ reviews_count }} clientes no Google.</p></div></section>
+  {% endif %}
+  <section class="wrap section grid2" aria-labelledby="visite">
+    <div><h2 id="visite">Visite a gente</h2><p>{{ address or (neighborhood or city) }}</p>{% if phone %}<p>Telefone: <a href="tel:{{ phone_digits }}">{{ phone }}</a></p>{% endif %}</div>
+    <div><h2>Horário</h2>{% if hours %}<ul class="hours">{% for h in hours %}<li>{{ h }}</li>{% endfor %}</ul>{% else %}<p>Consulte pelo WhatsApp.</p>{% endif %}</div>
+  </section>
+</main>
+{% endblock %}

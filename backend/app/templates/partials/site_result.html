@@ -1,0 +1,11 @@
+{% from "_macros.html" import icon %}
+<div class="rec principal" role="status">
+  <p><b>Amostra pronta</b> <span class="chip">{{ TEMPLATE_LABELS.get(site.template, site.template) }}</span></p>
+  <p class="why">Link para a mensagem: <span id="site-link">{{ site.preview_url }}</span></p>
+  {% if local %}<p class="small">Este link só abre no seu computador. Para mandar ao cliente, publique as amostras (veja Ajuda) e preencha PREVIEWS_PUBLIC_URL.</p>{% endif %}
+  <div class="row"><a class="btn sm primary" href="/previews/{{ site.slug }}/" target="_blank" rel="noopener">Abrir amostra {{ icon("ext") }}</a>
+    <button type="button" class="btn sm" data-copy="#site-link">{{ icon("copy") }} Copiar link</button></div>
+  <details class="disclosure"><summary>Ver a prévia aqui</summary>
+    <iframe class="preview-frame" src="/previews/{{ site.slug }}/" title="Prévia da amostra de {{ lead.name }}" sandbox="allow-scripts allow-popups" loading="lazy" referrerpolicy="no-referrer"></iframe></details>
+</div>
+<span id="dw-status" hx-swap-oob="true"><span class="status {{ lead.status }}"><i class="dot" aria-hidden="true"></i>{{ lead.status_label }}</span></span>

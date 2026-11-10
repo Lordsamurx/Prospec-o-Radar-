@@ -1,0 +1,21 @@
+{% extends "base.html" %}{% from "_macros.html" import icon %}
+{% block title %}Funil{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Funil</h1><p>Arraste o cartão para mudar a etapa, ou use o seletor em cada cartão.</p></div>
+  <form class="row" action="/funil" method="get">
+    <label class="sr-only" for="fn-niche">Filtrar por nicho</label>
+    <select id="fn-niche" name="niche" onchange="this.form.submit()" style="width:auto">
+      <option value="">Todos os nichos</option>
+      {% for key, n in by_niche %}<option value="{{ key }}" {{ 'selected' if key == niche }}>{{ cat().label(key) }} ({{ n }})</option>{% endfor %}
+    </select>
+    <noscript><button class="btn sm">Filtrar</button></noscript>
+  </form>
+</div>
+<div id="funnel-counts" hx-get="/funil{{ '?niche=' ~ niche if niche }}" hx-trigger="funnel-changed from:body" hx-target="this">{% include "partials/funnel_counts.html" %}</div>
+{% if total == 0 %}
+<section class="card empty"><h2>O funil está vazio</h2><p>Os leads entram aqui depois da primeira busca.</p><a class="btn primary" href="/buscas">Fazer uma busca</a></section>
+{% else %}
+<div id="kanban" hx-get="/funil{{ '?niche=' ~ niche if niche }}" hx-trigger="funnel-changed from:body" hx-target="this">{% include "partials/kanban.html" %}</div>
+{% endif %}
+{% endblock %}

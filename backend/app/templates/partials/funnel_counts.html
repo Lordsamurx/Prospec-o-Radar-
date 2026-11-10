@@ -1,0 +1,3 @@
+<ul class="funnel-strip" aria-label="Leads por etapa" tabindex="0">
+  {% for s in STATUSES %}<li class="cell"><b class="num">{{ counts.get(s, 0) }}</b><span class="xs muted">{{ STATUS_LABELS[s] }}</span></li>{% endfor %}
+</ul>

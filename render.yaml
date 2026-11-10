@@ -1,0 +1,31 @@
+# Publicação no Render (render.com): New > Blueprint > escolha o repositório.
+# Os valores com sync: false o Render pede na tela (nunca ficam no código).
+# Atenção: no plano grátis o disco não é permanente. Faça backup pela tela Configurações.
+services:
+  - type: web
+    name: radar-prospeccao
+    runtime: docker
+    plan: free
+    region: virginia
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: "8000"
+      - key: DATABASE_URL
+        value: sqlite:////app/data/radar.db
+      - key: PREVIEWS_DIR
+        value: /app/data/previews
+      - key: BACKUPS_DIR
+        value: /app/data/backups
+      - key: PLACES_PROVIDER
+        value: osm
+      - key: APP_USER
+        value: samuel
+      - key: APP_PASSWORD
+        sync: false          # obrigatório na internet: escolha uma senha forte
+      - key: BASE_URL
+        sync: false          # o endereço que o Render der
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false          # opcional
+      - key: GEMINI_API_KEY
+        sync: false          # opcional

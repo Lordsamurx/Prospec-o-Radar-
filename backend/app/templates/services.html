@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Serviços{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Serviços por categoria</h1><p>O que você vende, para quem, e onde está a demanda nos seus leads.</p></div></div>
+{% set unpriced = services.values()|selectattr("active")|selectattr("price_min", "none")|list %}
+{% if unpriced %}<p class="banner" role="note">{{ unpriced|length }} serviço(s) ainda sem preço. Sem preço, a proposta sai com “a definir”. Preencha em “Editar preço e texto”.</p>{% endif %}
+
+{% if highlights %}
+<section class="card stack" aria-labelledby="h-dem">
+  <h2 id="h-dem">Onde está a demanda</h2>
+  <div class="bars">
+    {% set top = highlights[0][2] %}
+    {% for niche, svc, n in highlights %}
+    <div class="bar-row wide"><a href="/leads?niche={{ niche.key }}&amp;service={{ svc.key }}">{{ niche.label }}</a>
+      <span class="meter" aria-hidden="true"><i style="--v: {{ (100 * n / top)|round|int }}%"></i></span>
+      <span class="small"><b class="num">{{ n }}</b> · {{ svc.name }}</span></div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="stack" aria-labelledby="h-cat">
+  <h2 id="h-cat">Catálogo</h2>
+  <div class="svc-grid">{% for s in services.values() %}{% include "partials/service_card.html" %}{% endfor %}</div>
+</section>
+
+<section class="stack" aria-labelledby="h-mat">
+  <h2 id="h-mat">Setor e nicho × serviço</h2>
+  <p class="small muted">Cada número é a quantidade de leads daquele nicho com o serviço recomendado. Em destaque, o serviço que mais vende no nicho.</p>
+  {% for m in matrix %}
+  <details class="disclosure card" {{ 'open' if m.leads }}>
+    <summary>{{ m.sector.icon }} {{ m.sector.label }} <span class="kcount">{{ m.leads }} lead{{ '' if m.leads == 1 else 's' }}</span> <span class="muted small">{{ m.rows|length }} nichos</span></summary>
+    <div class="table-wrap" tabindex="0" role="region" aria-label="Matriz de {{ m.sector.label }}"><table class="table matrix">
+      <thead><tr><th scope="col">Nicho</th><th scope="col" class="n">Leads</th>{% for k in m.offers if k in services %}<th scope="col" class="rot">{{ services[k].name }}</th>{% endfor %}</tr></thead>
+      <tbody>{% for r in m.rows %}<tr>
+        <th scope="row"><a href="/leads?niche={{ r.niche.key }}">{{ r.niche.label }}</a></th><td class="n">{{ r.leads }}</td>
+        {% for k in m.offers if k in services %}{% set c = r.cells.get(k, 0) %}
+        <td class="cell {{ 'main' if k == r.main }} {{ 'zero' if not c }}">{% if c %}<a href="/leads?niche={{ r.niche.key }}&amp;service={{ k }}">{{ c }}</a>{% elif k == r.main %}<span title="Serviço principal deste nicho">●</span><span class="sr-only">principal</span>{% else %}<span aria-hidden="true">·</span><span class="sr-only">0</span>{% endif %}</td>{% endfor %}
+      </tr>{% endfor %}</tbody></table></div>
+  </details>
+  {% endfor %}
+</section>
+{% endblock %}

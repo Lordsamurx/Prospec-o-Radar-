@@ -1,0 +1,20 @@
+{% if error %}<p class="banner danger" role="alert">{{ error }}</p>{% endif %}
+{% if result %}
+  {% if result.stopped %}<p class="banner">{{ result.stopped }}</p>{% endif %}
+  {% for e in result.errors %}<p class="banner danger">{{ e.niche }} · {{ e.location }}: {{ e.error }}</p>{% endfor %}
+{% endif %}
+{% if jobs %}
+<div class="stack sm">
+  <div class="row between"><p><b class="num">{{ jobs|length }}</b> busca(s) na fila{% if autorun %} <span class="spinner" aria-hidden="true"></span> <span class="muted small">rodando…</span>{% endif %}</p>
+    {% if not autorun %}<button class="btn sm primary" type="button" hx-post="/buscas/fila/processar" hx-target="#queue" hx-swap="innerHTML">Rodar a fila</button>{% endif %}</div>
+  <ul class="mini-list">
+    {% for j in jobs[:12] %}<li class="row between" style="padding: var(--s-1) 0"><span class="small">{{ j.niche }} · {{ j.location_text }}</span>
+      <button class="btn sm ghost" type="button" hx-post="/buscas/fila/{{ j.id }}/cancelar" hx-target="#queue" hx-swap="innerHTML">Cancelar</button></li>{% endfor %}
+    {% if jobs|length > 12 %}<li class="xs muted">e mais {{ jobs|length - 12 }}.</li>{% endif %}
+  </ul>
+  {% if autorun %}<span hx-post="/buscas/fila/processar" hx-trigger="load delay:1500ms" hx-target="#queue" hx-swap="innerHTML"></span>{% endif %}
+</div>
+{% elif result or added %}<p class="banner ok" role="status">Fila concluída. <a href="/leads?sort=newest">Ver os leads novos</a></p>
+{% else %}<p class="small muted">Fila vazia.</p>{% endif %}
+{% if failed %}<details class="disclosure"><summary>Buscas que falharam ({{ failed|length }})</summary>
+  <ul class="stack sm small">{% for j in failed %}<li>{{ j.niche }} · {{ j.location_text }}: {{ j.error }}</li>{% endfor %}</ul></details>{% endif %}

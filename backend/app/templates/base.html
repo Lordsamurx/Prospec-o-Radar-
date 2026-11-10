@@ -1,0 +1,111 @@
+{% from "_macros.html" import icon, radar %}<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="dark light">
+<title>{% block title %}Hoje{% endblock %} · Radar</title>
+<script>(function(){try{var t=localStorage.getItem("radar-theme");if(!t){t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}document.documentElement.dataset.theme=t}catch(e){}})()</script>
+<link rel="preload" href="/static/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+{% block head %}{% endblock %}
+<link rel="stylesheet" href="/static/css/tokens.css">
+<link rel="stylesheet" href="/static/css/app.css">
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+</head>
+<body {% if open_lead %}data-open-lead-now="{{ open_lead }}"{% endif %}>
+<a class="skip" href="#conteudo">Pular para o conteúdo</a>
+<div class="shell">
+  <aside class="sidebar" aria-label="Menu">
+    <a class="brand" href="/">{{ radar("brand-mark") }} Radar</a>
+    <nav aria-label="Telas">
+      {% for href, label, key in NAV %}
+      <a href="{{ href }}" {% if active == key %}aria-current="page"{% endif %}>{{ icon(key) }} {{ label }}</a>
+      {% endfor %}
+    </nav>
+    <div class="foot">
+      <a class="btn primary sm" href="/sessao" style="white-space:nowrap">{{ icon("play") }} Sessão de prospecção</a>
+      <nav aria-label="Ajustes">
+        <a href="/config" {% if request.url.path.startswith('/config') %}aria-current="page"{% endif %}>{{ icon("config") }} Configurações</a>
+        <a href="/ajuda" {% if request.url.path.startswith('/ajuda') %}aria-current="page"{% endif %}>{{ icon("ajuda") }} Ajuda</a>
+      </nav>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <a class="brand" href="/">{{ radar("brand-mark") }} Radar</a>
+      <button type="button" class="btn ghost sm grow" style="justify-content:flex-start;max-width:420px" data-palette-open aria-haspopup="dialog" aria-label="Ir para… ou achar um lead Ctrl K">
+        {{ icon("buscas") }} <span class="truncate wide">Ir para… ou achar um lead</span> <kbd class="right wide">Ctrl K</kbd>
+      </button>
+      <span class="right" id="quota-chip" hx-get="/api/quota" hx-trigger="quota-changed from:body" hx-swap="innerHTML">{% include "partials/quota_chip.html" %}</span>
+      <button type="button" class="icon-btn" data-theme-toggle aria-label="Trocar entre tema claro e escuro" title="Tema claro ou escuro">{{ icon("tema") }}</button>
+      <a class="icon-btn" href="/config" aria-label="Configurações" title="Configurações">{{ icon("config") }}</a>
+    </header>
+    <main id="conteudo" class="page" tabindex="-1">
+      {% if mock_mode %}
+      <p class="banner info" role="note">Modo demonstração: os negócios desta tela são fictícios (PLACES_PROVIDER=mock).</p>
+      {% elif mock_hidden and active in ("hoje", "leads", "funil") %}
+      <p class="banner info" role="note">{{ mock_hidden }} lead(s) fictício(s) de teste estão escondidos.
+        <a href="/leads?show_mock=1">Ver fictícios</a> · <a href="/config#ficticios">Arquivar</a></p>
+      {% endif %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+<nav class="bottom-nav" aria-label="Telas">
+  {% for href, label, key in NAV %}
+  <a href="{{ href }}" {% if active == key %}aria-current="page"{% endif %}>{{ icon(key) }}<span>{{ label }}</span></a>
+  {% endfor %}
+</nav>
+
+<div class="overlay" id="overlay" data-drawer-close></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Detalhes do lead" tabindex="-1">
+  <div class="drawer-body" id="drawer-body"></div>
+</aside>
+
+<dialog class="palette" id="palette" aria-label="Paleta de comandos">
+  <input type="search" id="palette-input" placeholder="Digite uma tela, uma ação ou o nome de um lead" autocomplete="off"
+         role="combobox" aria-expanded="true" aria-controls="palette-list" aria-autocomplete="list" aria-label="Comando ou nome do lead">
+  <ul id="palette-list" role="listbox" aria-label="Resultados"></ul>
+</dialog>
+
+<dialog id="stage-dialog" aria-labelledby="stage-title">
+  <form class="dlg" method="dialog" id="stage-form">
+    <h2 id="stage-title">Mudar etapa</h2>
+    <p class="muted" id="stage-text"></p>
+    <div class="field" data-for="PERDIDO"><label for="stage-reason">Por que perdeu?</label>
+      <select id="stage-reason" name="lost_reason">{% for k, v in LOST_REASONS.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}</select></div>
+    <div class="form-grid" data-for="FECHADO PROPOSTA">
+      <div class="field"><label for="stage-value">Valor fechado (R$)</label><input type="text" inputmode="decimal" id="stage-value" name="value" placeholder="1500"></div>
+      <div class="field"><label for="stage-rec">Mensalidade (R$)</label><input type="text" inputmode="decimal" id="stage-rec" name="recurring" placeholder="opcional"></div>
+    </div>
+    <div class="field"><label for="stage-note">Observação (opcional)</label><input type="text" id="stage-note" name="note" maxlength="200"></div>
+    <div class="dlg-foot"><button type="button" class="btn ghost" data-dialog-close>Cancelar</button><button type="submit" class="btn primary" value="ok">Salvar etapa</button></div>
+  </form>
+</dialog>
+
+<dialog id="keys-dialog" aria-labelledby="keys-title">
+  <div class="dlg">
+    <h2 id="keys-title">Atalhos do teclado</h2>
+    <dl class="kv">
+      <dt><kbd>Ctrl</kbd> <kbd>K</kbd></dt><dd>Abrir a paleta de comandos</dd>
+      <dt><kbd>J</kbd> / <kbd>K</kbd></dt><dd>Próximo e anterior na lista de leads</dd>
+      <dt><kbd>Enter</kbd></dt><dd>Abrir o lead marcado</dd>
+      <dt><kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd></dt><dd>Dar nota A, B ou C ao lead marcado ou aberto</dd>
+      <dt><kbd>E</kbd></dt><dd>Mudar a etapa do lead aberto</dd>
+      <dt><kbd>/</kbd></dt><dd>Ir para o campo de busca</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Fechar o painel</dd>
+      <dt><kbd>?</kbd></dt><dd>Mostrar esta lista</dd>
+    </dl>
+    <div class="dlg-foot"><button type="button" class="btn" data-dialog-close>Fechar</button></div>
+  </div>
+</dialog>
+
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+<script src="/static/vendor/htmx.min.js"></script>
+{% block scripts %}{% endblock %}
+<script src="/static/js/app.js" defer></script>
+<script src="/static/vendor/alpine-focus.min.js" defer></script>
+<script src="/static/vendor/alpine.min.js" defer></script>
+</body>
+</html>

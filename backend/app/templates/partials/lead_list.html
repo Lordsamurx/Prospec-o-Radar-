@@ -1,0 +1,82 @@
+{% from "_macros.html" import icon, score, status, radar %}
+<div class="stack">
+  <div class="toolbar">
+    <p class="grow"><b class="num" data-count="{{ total }}">{{ total }}</b> lead{{ '' if total == 1 else 's' }}{% if shown < total %} <span class="muted">(mostrando {{ shown }})</span>{% endif %}</p>
+    <div class="seg" role="group" aria-label="Modo de ver">
+      <a href="/leads?{{ qs }}{{ '&' if qs }}view=lista" aria-current="{{ 'true' if view == 'lista' else 'false' }}">{{ icon("leads") }} Lista</a>
+      <a href="/leads?{{ qs }}{{ '&' if qs }}view=mapa" aria-current="{{ 'true' if view == 'mapa' else 'false' }}">{{ icon("map") }} Mapa</a>
+    </div>
+    <a class="btn sm" href="/leads?{{ qs }}{{ '&' if qs }}format=csv">Exportar CSV</a>
+  </div>
+  {% if chips %}
+  <div class="chips" aria-label="Filtros ativos">
+    {% for c in chips %}<a class="chip" href="/leads?{{ c.remove_qs }}{{ '&' if c.remove_qs }}view={{ view }}" aria-label="Tirar filtro {{ c.label }}">{{ c.label }} <span class="x" aria-hidden="true">×</span></a>{% endfor %}
+    <a class="small" href="/leads?view={{ view }}">Limpar tudo</a>
+  </div>
+  {% endif %}
+
+  {% if not leads %}
+  <section class="card empty">
+    {{ radar() }}
+    {% if chips %}<h2>Nenhum lead com estes filtros</h2><p>Tire um filtro ou limpe tudo para ver mais.</p><a class="btn" href="/leads">Limpar filtros</a>
+    {% else %}<h2>Nenhum lead ainda</h2><p>Faça uma busca para encher o radar.</p><a class="btn primary" href="/buscas">Fazer uma busca</a>{% endif %}
+  </section>
+  {% elif view == "mapa" %}
+  {% set pts = leads|selectattr("lat")|selectattr("lng")|list %}
+  <div id="lead-map" class="map" role="application" aria-label="Mapa com {{ pts|length }} leads"></div>
+  <p class="small muted">{{ pts|length }} de {{ shown }} leads têm localização. Mapa: © colaboradores do OpenStreetMap.</p>
+  <script type="application/json" id="map-data">{{ {"center": center, "leads": map_points}|tojson }}</script>
+  {% else %}
+  <div class="row"><label class="check"><input type="checkbox" id="pick-all"> Marcar todos desta lista</label></div>
+  <ul class="lead-list" aria-label="Leads">
+    {% for lead in leads %}
+    <li class="lead-row" data-id="{{ lead.id }}">
+      <label class="pick"><input type="checkbox" value="{{ lead.id }}" name="ids" form="bulk"><span class="sr-only">Marcar {{ lead.name }}</span></label>
+      {{ score(lead.score, false, lead.score_reason) }}
+      <div class="grow" style="min-width:0">
+        <div class="row nowrap">{% if lead.maps_url %}<a class="lead-name truncate" href="{{ lead.maps_url }}" target="_blank" rel="noopener" title="Abrir {{ lead.name }} no Google Maps (nova aba)">{{ lead.name }}</a>{% else %}<span class="lead-name truncate">{{ lead.name }}</span>{% endif %}</div>
+        <p class="small muted truncate">{{ cat().label(lead.niche) }}{% if lead.neighborhood %} · {{ lead.neighborhood }}{% endif %}{% if lead.city and not lead.neighborhood %} · {{ lead.city }}{% endif %}</p>
+        <div class="facts">
+          <span class="chip {{ 'ruim' if lead.site_kind in ('none', 'social', 'platform', 'own_down') else ('atencao' if lead.site_kind in ('own_nohttps', 'own_weak') else 'bom') }}">{{ SITE_KIND_LABELS.get(lead.site_kind, lead.site_kind) }}{% if lead.site_platform and lead.site_kind in ('social', 'platform') %}: {{ lead.site_platform }}{% endif %}</span>
+          {% if lead.rating %}<span class="chip"><span aria-hidden="true">★</span> {{ lead.rating|stars }} <span class="muted">({{ lead.reviews_count }})</span><span class="sr-only"> no Google</span></span>
+          {% elif lead.from_osm and not lead.gmb_check %}<span class="chip desconhecido">Google não conferido</span>{% endif %}
+          {% if lead.profile and lead.profile in PROFILES %}<span class="chip">{{ PROFILES[lead.profile][0] }}</span>{% endif %}
+          {% if lead.is_mock %}<span class="chip info">Fictício</span>{% endif %}
+          {% if lead.archived %}<span class="chip">Arquivado</span>{% endif %}
+          {% if lead.id in stale_ids %}<span class="chip atencao">Dados antigos</span>{% endif %}
+          {% for t in lead.tag_list %}<span class="chip accent">#{{ t }}</span>{% endfor %}
+        </div>
+      </div>
+      <div class="side">
+        <span class="row tight acts">
+          {% if lead.phone_type == "mobile" %}<a class="chip" href="{{ whatsapp_link(lead.phone) }}" target="_blank" rel="noopener noreferrer" aria-label="Abrir WhatsApp de {{ lead.name }}">WhatsApp</a>{% endif %}
+          {% if lead.website_url %}<a class="chip" href="{{ lead.website_url }}" target="_blank" rel="noopener noreferrer nofollow" aria-label="Ver site de {{ lead.name }}">Ver site</a>{% endif %}
+          <button type="button" class="chip" hx-post="/leads/{{ lead.id }}/site?view=none" hx-swap="none" aria-label="Gerar amostra para {{ lead.name }}">Gerar amostra</button>
+          <button type="button" class="chip accent open" data-open-lead="{{ lead.id }}" aria-label="Abrir detalhes de {{ lead.name }}">Detalhes</button>
+        </span>
+        <span class="opp" title="Índice de oportunidade (0 a 100)"><span class="meter" aria-hidden="true"><i style="--v: {{ lead.opportunity }}%"></i></span>{{ lead.opportunity }}<span class="sr-only"> de oportunidade</span></span>
+        {% if lead.rec_main and lead.rec_main in services %}<span class="chip accent">{{ services[lead.rec_main].name }}</span>{% endif %}
+        {{ status(lead) }}
+        {% if lead.next_action_at %}<span class="{{ 'chip ruim' if lead.next_action_at <= now and lead.status not in ('SEM_RESPOSTA', 'PERDIDO', 'DESCARTADO', 'ENTREGUE') else '' }}">{{ lead.next_action_at|day }}</span>{% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% if shown < total %}<p class="small muted">Mostrando os {{ shown }} primeiros de {{ total }}. Use os filtros para afunilar.</p>{% endif %}
+
+  <form id="bulk" class="bulkbar" hidden hx-post="/leads/bulk" hx-swap="none" aria-label="Ações em lote">
+    <strong id="bulk-count">0 leads marcados</strong>
+    <label class="sr-only" for="bulk-action">Ação</label>
+    <select id="bulk-action" name="action" required>
+      <option value="">O que fazer…</option><option value="status">Mudar etapa</option><option value="tag">Pôr tag</option>
+      <option value="samples">Gerar amostras</option><option value="archive">Arquivar</option>
+      {% if f.show_archived %}<option value="unarchive">Tirar do arquivo</option>{% endif %}<option value="dnc">Não contatar</option>
+    </select>
+    <span data-bulk-for="status" hidden><label class="sr-only" for="bulk-status">Etapa</label>
+      <select id="bulk-status" name="status">{% for s in STATUSES %}<option value="{{ s }}">{{ STATUS_LABELS[s] }}</option>{% endfor %}</select></span>
+    <span data-bulk-for="tag" hidden><label class="sr-only" for="bulk-tag">Tag</label><input type="text" id="bulk-tag" name="tag" placeholder="tag" maxlength="30"></span>
+    <button class="btn primary sm" type="submit">Aplicar</button>
+    <button class="btn sm" type="button" data-bulk-csv>Exportar marcados</button>
+  </form>
+  {% endif %}
+</div>

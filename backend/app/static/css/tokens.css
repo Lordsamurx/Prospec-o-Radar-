@@ -1,0 +1,67 @@
+/* Radar · tokens de design. Toda cor, espaço e raio da interface sai daqui.
+   Tema escuro é o padrão; o claro entra com <html data-theme="light">. */
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("../fonts/bricolage-grotesque-latin-wght-normal.woff2") format("woff2");
+  font-weight: 200 800; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Geist";
+  src: url("../fonts/geist-latin-wght-normal.woff2") format("woff2");
+  font-weight: 100 900; font-style: normal; font-display: swap;
+}
+
+:root {
+  /* tipografia */
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-text: "Geist", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --text-xs: .75rem; --text-sm: .8125rem; --text-md: .9375rem; --text-lg: 1.125rem;
+  --text-xl: 1.5rem; --text-2xl: 2rem; --text-3xl: 2.75rem;
+
+  /* espaço (base 4px) */
+  --s-1: .25rem; --s-2: .5rem; --s-3: .75rem; --s-4: 1rem; --s-5: 1.5rem; --s-6: 2rem; --s-7: 3rem;
+
+  /* forma */
+  --r-sm: 6px; --r-md: 10px; --r-lg: 16px; --r-pill: 999px;
+  --tap: 44px; /* alvo mínimo de toque */
+  --sidebar: 224px; --drawer: 560px;
+  --ease: cubic-bezier(.2, .7, .2, 1); --fast: 140ms; --slow: 260ms;
+
+  /* tema escuro (padrão) */
+  color-scheme: dark;
+  --bg: #0a0e13; --surface: #111720; --surface-2: #18202b; --surface-3: #202a37;
+  --line: #263140; --line-strong: #3a4859;
+  --text: #e9eef3; --muted: #9eabb9; --faint: #7f8d9c;
+  --accent: #4ade9a; --accent-strong: #6ff0b3; --accent-ink: #04261a; --accent-soft: #10321f;
+  --focus: #8ab4ff;
+  --danger: #ff8f98; --danger-soft: #3d151a; --danger-solid: #c93545; --danger-ink: #ffffff;
+  --warn: #ffd166; --warn-soft: #3a2c08;
+  --info: #8ab4ff; --info-soft: #14243f;
+  --score-a: #7cf0b8; --score-a-bg: #103a27;
+  --score-b: #ffd166; --score-b-bg: #3d2e08;
+  --score-c: #c3ced9; --score-c-bg: #26313e;
+  --score-d: #ff9aa2; --score-d-bg: #43171c;
+  --shadow: 0 18px 48px rgba(0, 0, 0, .5);
+  --overlay: rgba(3, 6, 10, .66);
+  --radar-ring: rgba(74, 222, 154, .14);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f3f5f0; --surface: #ffffff; --surface-2: #eceee7; --surface-3: #e2e5dc;
+  --line: #d6dacf; --line-strong: #a9b0a2;
+  --text: #121a21; --muted: #4f5b67; --faint: #66727e;
+  --accent: #0a6e47; --accent-strong: #075a3a; --accent-ink: #ffffff; --accent-soft: #d9f2e5;
+  --focus: #1455c0;
+  --danger: #a3202d; --danger-soft: #fbe1e3; --danger-solid: #b3261e; --danger-ink: #ffffff;
+  --warn: #7a4d00; --warn-soft: #fdecc4;
+  --info: #1455c0; --info-soft: #dfe9fb;
+  --score-a: #0a5c3b; --score-a-bg: #d3f1e1;
+  --score-b: #744800; --score-b-bg: #fde9bb;
+  --score-c: #3a4652; --score-c-bg: #e3e7eb;
+  --score-d: #8f1d28; --score-d-bg: #fadadd;
+  --shadow: 0 18px 48px rgba(18, 26, 33, .18);
+  --overlay: rgba(18, 26, 33, .45);
+  --radar-ring: rgba(10, 110, 71, .12);
+}

@@ -1,0 +1,11 @@
+{% from "_macros.html" import score %}
+{% set overdue = lead.next_action_at and lead.next_action_at <= now and lead.status not in ('SEM_RESPOSTA', 'PERDIDO', 'DESCARTADO', 'ENTREGUE') %}
+<li class="kcard {{ 'overdue' if overdue }}" draggable="true" data-id="{{ lead.id }}" data-status="{{ lead.status }}" data-name="{{ lead.name }}">
+  <div class="row nowrap">{{ score(lead.score) }}<button type="button" class="open grow truncate" data-open-lead="{{ lead.id }}">{{ lead.name }}</button></div>
+  <p class="xs muted truncate">{{ cat().label(lead.niche) }}{% if lead.neighborhood %} · {{ lead.neighborhood }}{% endif %}</p>
+  {% if lead.next_action %}<p class="xs">{{ lead.next_action }}{% if lead.next_action_at %} · <span class="{{ 'chip ruim' if overdue else 'muted' }}">{{ lead.next_action_at|day }}</span>{% endif %}</p>{% endif %}
+  {% if lead.proposal_value %}<p class="xs"><b>{{ lead.proposal_value|money }}</b></p>{% endif %}
+  <label class="sr-only" for="ks-{{ lead.id }}">Etapa de {{ lead.name }}</label>
+  <select id="ks-{{ lead.id }}" data-stage-select="{{ lead.id }}" data-name="{{ lead.name }}">
+    {% for s in STATUSES %}<option value="{{ s }}" {{ 'selected' if s == lead.status }}>{{ STATUS_LABELS[s] }}</option>{% endfor %}</select>
+</li>

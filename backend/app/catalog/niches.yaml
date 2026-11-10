@@ -1,0 +1,457 @@
+# Catálogo de nichos da v3: setor -> nicho. É o ÚNICO lugar com texto ou regra de um ramo.
+# Nicho novo = uma linha a mais em `niches`. O que o nicho não define, herda do setor.
+#
+# Campos do nicho:
+#   key, sector, label, plural, term (o que o cliente digita no Google), aliases (sem acento),
+#   google_types (tipos que contam como "dentro do nicho"; vazio = não checa categoria),
+#   type_suffixes, included_type (Text Search; só tipos da Tabela A em google_types.txt),
+#   osm (filtros Overpass; mais de um = união), min_rating / min_reviews (limites da nota A),
+#   tagline, cta, wa_message, services ([ícone, título, texto]), services_by_type,
+#   template (modelo da amostra) e default_offer (serviço que mais vende).
+defaults:
+  min_rating: 4.0
+  min_reviews: 15
+
+sectors:
+  - key: beleza
+    label: "Beleza e bem-estar"
+    color: "#e0569b"
+    icon: "✂️"
+    template: agendamento
+    default_offer: agendamento
+    offers: [agendamento, landing, gmn_otimizacao, avaliacoes, links, carrosseis, manutencao, institucional, reformulacao, seo_local, gmn_criacao, dominio_email]
+    pitch: "Cliente que acha o salão no Google quer marcar na hora. Sem página de agendamento, ele marca no concorrente."
+    tagline: "Cuidado com hora marcada, pertinho de você."
+    cta: "Agendar pelo WhatsApp"
+    wa_message: "Olá! Vi o site de vocês ({name}) e quero agendar um horário."
+    services:
+      - ["✨", "Atendimento com hora marcada", "Você escolhe o horário e é atendido sem fila."]
+      - ["💆", "Cuidado personalizado", "Cada atendimento é pensado para você."]
+      - ["📍", "Fácil de chegar", "Endereço e horário sempre à vista."]
+  - key: saude
+    label: "Saúde"
+    color: "#22a6b3"
+    icon: "🩺"
+    template: agendamento
+    default_offer: institucional
+    offers: [institucional, agendamento, landing, gmn_otimizacao, avaliacoes, seo_local, dominio_email, manutencao, reformulacao, gmn_criacao, carrosseis]
+    pitch: "Paciente pesquisa antes de marcar. Um site com especialidades, convênios e botão de consulta passa a confiança que o Instagram não passa."
+    tagline: "Atendimento com atenção, do primeiro contato ao retorno."
+    cta: "Marcar consulta"
+    wa_message: "Olá! Vi o site de vocês ({name}) e quero marcar uma consulta."
+    services:
+      - ["🩺", "Consultas", "Atendimento com hora marcada e sem pressa."]
+      - ["📋", "Avaliação", "Primeira avaliação para entender o seu caso."]
+      - ["💬", "Tire suas dúvidas", "Fale com a equipe pelo WhatsApp."]
+  - key: alimentacao
+    label: "Alimentação"
+    color: "#f0932b"
+    icon: "🍽️"
+    template: cardapio
+    default_offer: cardapio
+    offers: [cardapio, landing, gmn_otimizacao, avaliacoes, links, carrosseis, manutencao, reformulacao, seo_local, gmn_criacao]
+    pitch: "Restaurante sem cardápio online perde pedido para o iFood, que ainda fica com a taxa."
+    tagline: "Comida boa, feita na hora. Peça pelo WhatsApp."
+    cta: "Pedir pelo WhatsApp"
+    wa_message: "Olá! Vi o cardápio de vocês ({name}) e quero fazer um pedido."
+    services:
+      - ["🍽️", "Cardápio do dia", "Pratos feitos na hora, com ingredientes frescos."]
+      - ["🛵", "Delivery", "Peça pelo WhatsApp e receba em casa."]
+      - ["🎉", "Encomendas", "Pedidos para grupos e eventos."]
+  - key: pet
+    label: "Pet"
+    color: "#6ab04c"
+    icon: "🐾"
+    template: agendamento
+    default_offer: agendamento
+    offers: [agendamento, landing, gmn_otimizacao, avaliacoes, catalogo, links, carrosseis, manutencao, reformulacao, seo_local, gmn_criacao]
+    pitch: "Dono de pet procura 'banho e tosa perto de mim'. Quem aparece com horário e botão de WhatsApp fica com o cliente."
+    tagline: "Cuidado e carinho para o seu pet."
+    cta: "Agendar pelo WhatsApp"
+    wa_message: "Olá! Vi o site de vocês ({name}) e quero agendar um horário para o meu pet."
+    services:
+      - ["🛁", "Banho e tosa", "Com produtos próprios para cada pelagem."]
+      - ["🦴", "Produtos", "Rações, petiscos e acessórios."]
+      - ["🩺", "Cuidados", "Orientação para a saúde do seu pet."]
+  - key: automotivo
+    label: "Automotivo"
+    color: "#eb4d4b"
+    icon: "🔧"
+    template: landing
+    default_offer: landing
+    offers: [landing, gmn_otimizacao, avaliacoes, institucional, seo_local, manutencao, reformulacao, gmn_criacao, catalogo, dominio_email]
+    pitch: "Quem está com o carro parado liga para a primeira oficina que passa confiança no Google."
+    tagline: "Serviço bem feito, com orçamento claro e sem surpresa."
+    cta: "Pedir orçamento"
+    wa_message: "Olá! Vi o site de vocês ({name}) e quero um orçamento."
+    services:
+      - ["🔧", "Serviço completo", "Diagnóstico e conserto com garantia."]
+      - ["🧾", "Orçamento claro", "Você aprova antes de qualquer serviço."]
+      - ["⏱️", "Prazo combinado", "Seu carro pronto no dia marcado."]
+  - key: casa
+    label: "Casa e construção"
+    color: "#a0763c"
+    icon: "🏠"
+    template: landing
+    default_offer: landing
+    offers: [landing, gmn_otimizacao, gmn_criacao, avaliacoes, institucional, seo_local, catalogo, manutencao, reformulacao, dominio_email]
+    pitch: "Serviço para casa é busca de urgência: 'chaveiro perto de mim'. Uma página com telefone e bairros atendidos vira ligação."
+    tagline: "Serviço de confiança, com orçamento rápido."
+    cta: "Pedir orçamento"
+    wa_message: "Olá! Vi o site de vocês ({name}) e quero um orçamento."
+    services:
+      - ["🛠️", "Serviço sob medida", "Avaliação no local e orçamento sem compromisso."]
+      - ["🧾", "Preço combinado", "Você sabe o valor antes de começar."]
+      - ["📍", "Atendemos a região", "Consulte os bairros atendidos."]
+  - key: fitness
+    label: "Fitness e esportes"
+    color: "#7c5cff"
+    icon: "🏋️"
+    template: agendamento
+    default_offer: landing
+    offers: [landing, agendamento, gmn_otimizacao, avaliacoes, links, carrosseis, manutencao, institucional, reformulacao, seo_local, gmn_criacao]
+    pitch: "Aula experimental é a porta de entrada. Uma landing page com horários e botão de WhatsApp enche a turma."
+    tagline: "Treine com acompanhamento e horários que cabem na sua rotina."
+    cta: "Agendar aula experimental"
+    wa_message: "Olá! Vi o site de vocês ({name}) e quero agendar uma aula experimental."
+    services:
+      - ["🏋️", "Treinos", "Montados e acompanhados por profissionais."]
+      - ["🤸", "Aulas", "Turmas em vários horários."]
+      - ["📋", "Avaliação", "Ponto de partida para o seu plano."]
+  - key: educacao
+    label: "Educação"
+    color: "#3d7cf0"
+    icon: "🎓"
+    template: landing
+    default_offer: landing
+    offers: [landing, institucional, gmn_otimizacao, avaliacoes, seo_local, carrosseis, dominio_email, manutencao, reformulacao, gmn_criacao]
+    pitch: "Pai e aluno comparam escolas no Google. Uma página com cursos, horários e botão de matrícula decide a visita."
+    tagline: "Aprender perto de casa, com quem entende do assunto."
+    cta: "Quero saber mais"
+    wa_message: "Olá! Vi o site de vocês ({name}) e quero saber sobre matrículas."
+    services:
+      - ["📚", "Cursos e turmas", "Opções para cada idade e nível."]
+      - ["🕒", "Horários flexíveis", "Manhã, tarde e noite."]
+      - ["🎯", "Aula experimental", "Conheça antes de se matricular."]
+  - key: profissionais
+    label: "Serviços profissionais"
+    color: "#2f8f83"
+    icon: "💼"
+    template: institucional
+    default_offer: institucional
+    offers: [institucional, landing, gmn_otimizacao, avaliacoes, seo_local, dominio_email, manutencao, reformulacao, gmn_criacao, carrosseis]
+    pitch: "Escritório sem site e sem e-mail próprio parece amador. Site institucional com áreas de atuação traz cliente melhor."
+    tagline: "Atendimento próximo e resultado, com quem conhece o assunto."
+    cta: "Falar com um especialista"
+    wa_message: "Olá! Vi o site de vocês ({name}) e quero conversar sobre um atendimento."
+    services:
+      - ["💼", "Atendimento consultivo", "Entendemos o seu caso antes de propor."]
+      - ["📑", "Processo claro", "Você acompanha cada etapa."]
+      - ["🤝", "Confiança", "Anos de atuação na região."]
+  - key: comercio
+    label: "Comércio local"
+    color: "#d4a017"
+    icon: "🛍️"
+    template: landing
+    default_offer: catalogo
+    offers: [catalogo, landing, gmn_otimizacao, avaliacoes, links, carrosseis, manutencao, reformulacao, seo_local, gmn_criacao]
+    pitch: "Loja de bairro que mostra os produtos online vende pelo WhatsApp mesmo de porta fechada."
+    tagline: "Tudo o que você procura, pertinho de casa."
+    cta: "Ver produtos pelo WhatsApp"
+    wa_message: "Olá! Vi o site de vocês ({name}) e quero saber de um produto."
+    services:
+      - ["🛍️", "Produtos selecionados", "Novidades toda semana."]
+      - ["💬", "Atendimento pelo WhatsApp", "Tire dúvidas e reserve."]
+      - ["🚚", "Entrega na região", "Consulte os bairros atendidos."]
+  - key: eventos
+    label: "Eventos e hospedagem"
+    color: "#b24fd1"
+    icon: "🎉"
+    template: landing
+    default_offer: institucional
+    offers: [institucional, landing, gmn_otimizacao, avaliacoes, carrosseis, seo_local, links, manutencao, reformulacao, gmn_criacao, dominio_email]
+    pitch: "Evento se vende por foto e data livre. Um site com galeria e pedido de orçamento fecha mais que perfil de rede social."
+    tagline: "Momentos especiais merecem um lugar à altura."
+    cta: "Consultar data"
+    wa_message: "Olá! Vi o site de vocês ({name}) e quero consultar uma data."
+    services:
+      - ["🎉", "Eventos completos", "Do planejamento ao grande dia."]
+      - ["📸", "Estrutura", "Espaço e equipe preparados."]
+      - ["🗓️", "Datas", "Consulte a disponibilidade."]
+  - key: outros
+    label: "Outro"
+    color: "#8a94a6"
+    icon: "⭐"
+    template: landing
+    default_offer: landing
+    offers: [landing, gmn_otimizacao, avaliacoes, institucional, links, manutencao, reformulacao, seo_local, gmn_criacao, dominio_email, carrosseis]
+    pitch: "Negócio local sem site depende de quem já conhece. Uma página simples faz ele ser achado por quem ainda não conhece."
+    tagline: "Atendimento de confiança, pertinho de você."
+    cta: "Falar pelo WhatsApp"
+    wa_message: "Olá! Vi o site de vocês ({name}) e quero mais informações."
+    services:
+      - ["⭐", "Atendimento", "Atendimento próximo e sem complicação."]
+      - ["📍", "Na sua região", "Fácil de chegar, com endereço e horário à vista."]
+      - ["💬", "Fale com a gente", "Tire dúvidas e peça orçamento pelo WhatsApp."]
+
+niches:
+  # ---------------------------------------------------------------- Beleza e bem-estar
+  - key: salao
+    sector: beleza
+    label: "Salão de beleza"
+    plural: "salões de beleza"
+    term: "salão"
+    aliases: [salao, salao de beleza, cabeleireiro, cabeleireira, cabelereiro, cabelo, maquiagem]
+    google_types: [beauty_salon, hair_salon, hair_care, nail_salon, beautician, makeup_artist]
+    included_type: beauty_salon
+    osm: ['["shop"~"hairdresser|beauty"]']
+    tagline: "Cabelo, unhas e cuidado com hora marcada, pertinho de você."
+    wa_message: "Olá! Vi o site do {name} e quero agendar."
+    services:
+      - ["✂️", "Corte e escova", "Corte feminino e masculino, escova e finalização."]
+      - ["🎨", "Coloração", "Mechas, luzes, tonalização e retoque de raiz."]
+      - ["💧", "Tratamentos", "Hidratação, reconstrução e cronograma capilar."]
+      - ["💅", "Unhas", "Manicure, pedicure e esmaltação em gel."]
+    services_by_type:
+      nail_salon:
+        - ["💅", "Manicure e pedicure", "Esmaltação tradicional, em gel e cuidados com as cutículas."]
+        - ["✨", "Alongamento", "Fibra, gel ou acrigel com acabamento natural."]
+        - ["🌿", "Spa dos pés", "Esfoliação, hidratação e relaxamento."]
+  - key: barbearia
+    sector: beleza
+    label: "Barbearia"
+    plural: "barbearias"
+    term: "barbearia"
+    aliases: [barbearia, barbeiro, barber, barbershop]
+    google_types: [barber_shop, hair_salon, hair_care]
+    included_type: barber_shop
+    osm: ['["shop"="hairdresser"]']
+    tagline: "Corte e barba com hora marcada, sem fila."
+    wa_message: "Olá! Vi o site da {name} e quero agendar um horário."
+    services:
+      - ["✂️", "Corte", "Clássico ou moderno, do seu jeito."]
+      - ["🪒", "Barba", "Toalha quente, navalha e finalização."]
+      - ["💈", "Combo", "Corte + barba com hora marcada."]
+  - key: estetica
+    sector: beleza
+    label: "Clínica de estética"
+    plural: "clínicas de estética"
+    term: "clínica de estética"
+    aliases: [estetica, clinica de estetica, esteticista, depilacao, harmonizacao, limpeza de pele]
+    google_types: [beauty_salon, spa, skin_care_clinic, beautician, massage, wellness_center, doctor, health]
+    osm: ['["shop"="beauty"]']
+    tagline: "Cuidados com a pele e o corpo, com avaliação personalizada."
+    cta: "Agendar avaliação"
+    wa_message: "Olá! Vi o site da {name} e quero agendar uma avaliação."
+    services:
+      - ["✨", "Limpeza de pele", "Higienização profunda e hidratação."]
+      - ["💆", "Tratamentos corporais", "Drenagem, massagem modeladora e protocolos personalizados."]
+      - ["🌿", "Depilação", "Cera ou laser, com conforto e segurança."]
+  - {key: esmalteria, sector: beleza, label: "Esmalteria e manicure", plural: "esmalterias", term: "manicure", aliases: [esmalteria, manicure, pedicure, unhas, nail, nail designer, alongamento de unhas], google_types: [nail_salon, beauty_salon, beautician, foot_care], included_type: nail_salon, osm: ['["shop"="beauty"]["beauty"~"nails"]', '["shop"="beauty"]["name"~"esmalteria|unhas|nail",i]']}
+  - {key: sobrancelha, sector: beleza, label: "Sobrancelha e cílios", plural: "estúdios de sobrancelha e cílios", term: "design de sobrancelha", aliases: [sobrancelha, sobrancelhas, cilios, design de sobrancelha, extensao de cilios, micropigmentacao, lash], google_types: [beauty_salon, beautician, makeup_artist], osm: ['["shop"="beauty"]["name"~"sobrancelha|cílios|cilios|lash",i]']}
+  - {key: spa, sector: beleza, label: "Spa e massagem", plural: "spas e espaços de massagem", term: "massagem", aliases: [spa, massagem, massoterapia, massagista, day spa, drenagem], google_types: [spa, massage, massage_spa, wellness_center, sauna], included_type: spa, osm: ['["leisure"="spa"]', '["shop"="massage"]']}
+  - {key: tatuagem, sector: beleza, label: "Estúdio de tatuagem", plural: "estúdios de tatuagem", term: "tatuagem", aliases: [tatuagem, tattoo, tatuador, piercing, estudio de tatuagem], google_types: [body_art_service], included_type: body_art_service, osm: ['["shop"="tattoo"]'], cta: "Pedir orçamento da tattoo", default_offer: landing, template: landing}
+  - {key: depilacao_laser, sector: beleza, label: "Depilação a laser", plural: "clínicas de depilação", term: "depilação a laser", aliases: [depilacao a laser, depilacao laser, laser], google_types: [beauty_salon, skin_care_clinic, beautician], osm: ['["shop"="beauty"]["name"~"depil|laser",i]']}
+  - {key: maquiagem, sector: beleza, label: "Maquiagem e penteado", plural: "maquiadores", term: "maquiadora", aliases: [maquiadora, maquiador, make, penteado, noivas], google_types: [makeup_artist, beauty_salon, beautician], osm: ['["shop"="beauty"]["name"~"make|maqui",i]'], default_offer: landing, template: landing}
+  - {key: podologia, sector: beleza, label: "Podologia", plural: "podólogos", term: "podólogo", aliases: [podologia, podologo, podologa], google_types: [foot_care, beauty_salon, health], osm: ['["healthcare"="podiatrist"]', '["name"~"podolog",i]']}
+  - {key: bronzeamento, sector: beleza, label: "Bronzeamento", plural: "estúdios de bronzeamento", term: "bronzeamento", aliases: [bronzeamento, bronze, bronzeamento natural], google_types: [tanning_studio, beauty_salon], osm: ['["name"~"bronze",i]']}
+  - {key: terapias, sector: beleza, label: "Terapias e bem-estar", plural: "espaços de terapias", term: "terapias integrativas", aliases: [terapias, terapia holistica, acupuntura, reiki, quiropraxia, yoga, ioga, meditacao], google_types: [wellness_center, yoga_studio, chiropractor, massage, health], osm: ['["healthcare"="alternative"]', '["name"~"acupuntura|yoga|reiki",i]']}
+
+  # ---------------------------------------------------------------- Saúde
+  - key: dentista
+    sector: saude
+    label: "Dentista"
+    plural: "dentistas"
+    term: "dentista"
+    aliases: [dentista, odonto, odontologia, odontologico, clinica odontologica, ortodontia, consultorio odontologico, implante dentario]
+    google_types: [dentist, dental_clinic, doctor, health]
+    included_type: dentist
+    osm: ['["amenity"="dentist"]', '["healthcare"="dentist"]']
+    tagline: "Seu sorriso cuidado com atenção, do check-up ao tratamento."
+    wa_message: "Olá! Vi o site do {name} e quero marcar uma consulta."
+    services:
+      - ["🦷", "Clínica geral", "Check-up, limpeza, restaurações e prevenção."]
+      - ["😁", "Estética dental", "Clareamento e facetas."]
+      - ["🔧", "Ortodontia", "Aparelhos fixos e alinhadores."]
+  - {key: clinica_medica, sector: saude, label: "Clínica médica", plural: "clínicas médicas", term: "clínica médica", aliases: [clinica medica, clinica, medico, consultorio medico, clinico geral, dermatologista, ginecologista, pediatra, cardiologista, ortopedista, oftalmologista], google_types: [doctor, medical_clinic, medical_center, health], included_type: doctor, osm: ['["amenity"~"clinic|doctors"]']}
+  - {key: fisioterapia, sector: saude, label: "Fisioterapia", plural: "clínicas de fisioterapia", term: "fisioterapia", aliases: [fisioterapia, fisioterapeuta, fisio, rpg, osteopatia], google_types: [physiotherapist, health, doctor, medical_clinic], included_type: physiotherapist, osm: ['["healthcare"="physiotherapist"]']}
+  - {key: psicologia, sector: saude, label: "Psicologia", plural: "psicólogos", term: "psicólogo", aliases: [psicologia, psicologo, psicologa, terapia, psicoterapia, psicanalista, psiquiatra], google_types: [doctor, health, medical_clinic, wellness_center], osm: ['["healthcare"="psychotherapist"]', '["name"~"psicolog",i]'], default_offer: landing, template: landing}
+  - {key: nutricao, sector: saude, label: "Nutrição", plural: "nutricionistas", term: "nutricionista", aliases: [nutricao, nutricionista, nutrologo, emagrecimento], google_types: [doctor, health, medical_clinic, wellness_center], osm: ['["healthcare"="nutrition_counselling"]', '["name"~"nutri",i]'], default_offer: landing, template: landing}
+  - {key: otica, sector: saude, label: "Ótica", plural: "óticas", term: "ótica", aliases: [otica, oticas, oculos, optica], google_types: [store, health], osm: ['["shop"="optician"]'], default_offer: catalogo, template: landing, cta: "Ver armações pelo WhatsApp", wa_message: "Olá! Vi o site de vocês ({name}) e quero ver armações."}
+  - {key: laboratorio, sector: saude, label: "Laboratório e exames", plural: "laboratórios", term: "laboratório de exames", aliases: [laboratorio, exames, analises clinicas, exame de sangue, ultrassom, imagem], google_types: [medical_lab, health, medical_clinic, medical_center], included_type: medical_lab, osm: ['["healthcare"="laboratory"]'], cta: "Agendar exame"}
+  - {key: fonoaudiologia, sector: saude, label: "Fonoaudiologia", plural: "fonoaudiólogos", term: "fonoaudiólogo", aliases: [fonoaudiologia, fonoaudiologo, fonoaudiologa, fono], google_types: [doctor, health, medical_clinic], osm: ['["healthcare"="speech_therapist"]', '["name"~"fono",i]'], default_offer: landing, template: landing}
+  - {key: farmacia_manipulacao, sector: saude, label: "Farmácia de manipulação", plural: "farmácias de manipulação", term: "farmácia de manipulação", aliases: [farmacia de manipulacao, manipulacao, farmacia], google_types: [pharmacy, drugstore, health], included_type: pharmacy, osm: ['["amenity"="pharmacy"]'], default_offer: landing, template: landing, cta: "Pedir orçamento da fórmula"}
+  - {key: cuidador, sector: saude, label: "Cuidador e home care", plural: "serviços de cuidadores", term: "cuidador de idosos", aliases: [cuidador, cuidadora, home care, casa de repouso, cuidador de idosos], google_types: [], osm: ['["amenity"="nursing_home"]', '["name"~"home care|cuidador",i]'], default_offer: landing, template: landing}
+  - {key: clinica_popular, sector: saude, label: "Clínica popular", plural: "clínicas populares", term: "clínica popular", aliases: [clinica popular, consulta popular, medicina do trabalho], google_types: [doctor, medical_clinic, medical_center, health], osm: ['["amenity"="clinic"]["name"~"popular|trabalho",i]']}
+
+  # ---------------------------------------------------------------- Alimentação
+  - key: restaurante
+    sector: alimentacao
+    label: "Restaurante"
+    plural: "restaurantes"
+    term: "restaurante"
+    aliases: [restaurante, comida, self service, bar, churrascaria, comida caseira]
+    google_types: [restaurant, food, meal_takeaway, meal_delivery, cafe, bar, bakery]
+    type_suffixes: ["_restaurant"]
+    included_type: restaurant
+    osm: ['["amenity"~"restaurant|fast_food|cafe"]']
+    wa_message: "Olá! Vi o site do {name} e quero fazer um pedido."
+    services:
+      - ["🍽️", "Almoço", "Pratos do dia e opções à la carte."]
+      - ["🛵", "Delivery", "Peça pelo WhatsApp e receba em casa."]
+      - ["🎉", "Encomendas", "Eventos e pedidos para grupos."]
+  - {key: pizzaria, sector: alimentacao, label: "Pizzaria", plural: "pizzarias", term: "pizzaria", aliases: [pizzaria, pizza, pizzas], google_types: [pizza_restaurant, pizza_delivery, restaurant, food, meal_takeaway, meal_delivery], type_suffixes: ["_restaurant"], included_type: pizza_restaurant, osm: ['["amenity"~"restaurant|fast_food"]["cuisine"~"pizza"]', '["amenity"~"restaurant|fast_food"]["name"~"pizza",i]']}
+  - {key: hamburgueria, sector: alimentacao, label: "Hamburgueria", plural: "hamburguerias", term: "hamburgueria", aliases: [hamburgueria, hamburguer, burger, burguer, smash], google_types: [hamburger_restaurant, fast_food_restaurant, restaurant, food, meal_takeaway, meal_delivery], type_suffixes: ["_restaurant"], included_type: hamburger_restaurant, osm: ['["amenity"~"restaurant|fast_food"]["cuisine"~"burger"]', '["amenity"~"restaurant|fast_food"]["name"~"burg",i]']}
+  - {key: lanchonete, sector: alimentacao, label: "Lanchonete", plural: "lanchonetes", term: "lanchonete", aliases: [lanchonete, lanches, lanche, salgados, pastelaria, pastel], google_types: [snack_bar, fast_food_restaurant, sandwich_shop, meal_takeaway, restaurant, food, cafe], type_suffixes: ["_restaurant"], included_type: fast_food_restaurant, osm: ['["amenity"="fast_food"]']}
+  - {key: padaria, sector: alimentacao, label: "Padaria e confeitaria", plural: "padarias", term: "padaria", aliases: [padaria, confeitaria, panificadora, paes], google_types: [bakery, pastry_shop, cake_shop, cafe, food, store], included_type: bakery, osm: ['["shop"~"bakery|pastry"]']}
+  - {key: marmitaria, sector: alimentacao, label: "Marmitaria", plural: "marmitarias", term: "marmitex", aliases: [marmitaria, marmita, marmitex, marmitas fit, quentinha], google_types: [meal_takeaway, meal_delivery, restaurant, food], type_suffixes: ["_restaurant"], osm: ['["amenity"~"restaurant|fast_food"]["name"~"marmit",i]']}
+  - {key: cafeteria, sector: alimentacao, label: "Cafeteria", plural: "cafeterias", term: "cafeteria", aliases: [cafeteria, cafe, coffee, cafe especial], google_types: [cafe, coffee_shop, cafeteria, bakery, food, tea_house], included_type: cafe, osm: ['["amenity"="cafe"]']}
+  - {key: acaiteria, sector: alimentacao, label: "Açaiteria e sorveteria", plural: "açaiterias e sorveterias", term: "açaí", aliases: [acaiteria, acai, sorveteria, sorvete, gelato, picole], google_types: [acai_shop, ice_cream_shop, dessert_shop, food, store, juice_shop], included_type: ice_cream_shop, osm: ['["amenity"="ice_cream"]', '["shop"="ice_cream"]', '["cuisine"~"ice_cream|acai"]']}
+  - {key: doceria, sector: alimentacao, label: "Doceria", plural: "docerias", term: "doceria", aliases: [doceria, doces, bolos, bolo, brigadeiro, confeiteira, cake], google_types: [dessert_shop, cake_shop, candy_store, confectionery, chocolate_shop, pastry_shop, bakery, food, store], included_type: dessert_shop, osm: ['["shop"~"confectionery|pastry|chocolate"]'], cta: "Encomendar pelo WhatsApp"}
+  - {key: japones, sector: alimentacao, label: "Comida japonesa", plural: "restaurantes japoneses", term: "sushi", aliases: [japones, sushi, temaki, temakeria, comida japonesa], google_types: [japanese_restaurant, sushi_restaurant, restaurant, food, meal_delivery, meal_takeaway], type_suffixes: ["_restaurant"], included_type: japanese_restaurant, osm: ['["amenity"~"restaurant|fast_food"]["cuisine"~"sushi|japanese"]']}
+  - {key: bar, sector: alimentacao, label: "Bar e petiscaria", plural: "bares", term: "bar", aliases: [boteco, petiscaria, pub, choperia, cervejaria, espetinho, espetaria], google_types: [bar, pub, bar_and_grill, brewery, restaurant, food], type_suffixes: ["_restaurant"], included_type: bar, osm: ['["amenity"~"bar|pub"]']}
+  - {key: acougue, sector: alimentacao, label: "Açougue e casa de carnes", plural: "açougues", term: "açougue", aliases: [acougue, casa de carnes, carnes], google_types: [butcher_shop, food_store, store, food], included_type: butcher_shop, osm: ['["shop"="butcher"]'], default_offer: catalogo, template: landing}
+  - {key: hortifruti, sector: alimentacao, label: "Hortifrúti e mercearia", plural: "hortifrútis", term: "hortifrúti", aliases: [hortifruti, sacolao, mercearia, mercadinho, emporio, produtos naturais], google_types: [grocery_store, food_store, market, health_food_store, convenience_store, store, food], included_type: grocery_store, osm: ['["shop"~"greengrocer|convenience|health_food"]'], default_offer: catalogo, template: landing}
+  - {key: food_truck, sector: alimentacao, label: "Food truck e delivery", plural: "deliverys", term: "delivery", aliases: [food truck, delivery, dark kitchen, tele entrega], google_types: [meal_delivery, meal_takeaway, food_delivery, restaurant, food], type_suffixes: ["_restaurant"], osm: ['["amenity"="fast_food"]["name"~"delivery|truck",i]']}
+
+  # ---------------------------------------------------------------- Pet
+  - key: petshop
+    sector: pet
+    label: "Pet shop e banho e tosa"
+    plural: "pet shops"
+    term: "pet shop"
+    aliases: [pet shop, petshop, pet, banho e tosa, tosa]
+    google_types: [pet_store, veterinary_care, pet_care, pet_boarding_service]
+    included_type: pet_store
+    osm: ['["shop"~"pet|pet_grooming"]']
+    tagline: "Banho, tosa e tudo para o seu pet, com carinho."
+    cta: "Agendar banho e tosa"
+    wa_message: "Olá! Vi o site do {name} e quero agendar um banho."
+    services:
+      - ["🛁", "Banho e tosa", "Com produtos próprios para cada pelagem."]
+      - ["🦴", "Rações e petiscos", "As principais marcas, com entrega."]
+      - ["🩺", "Cuidados", "Vacinas, vermífugos e orientação."]
+  - {key: veterinaria, sector: pet, label: "Clínica veterinária", plural: "clínicas veterinárias", term: "veterinário", aliases: [veterinario, veterinaria, clinica veterinaria, vet, hospital veterinario], google_types: [veterinary_care, pet_care, pet_store], included_type: veterinary_care, osm: ['["amenity"="veterinary"]'], cta: "Marcar consulta", default_offer: institucional, wa_message: "Olá! Vi o site de vocês ({name}) e quero marcar uma consulta para o meu pet."}
+  - {key: hotel_pet, sector: pet, label: "Adestramento e hotel pet", plural: "hotéis e creches para pets", term: "hotel para cachorro", aliases: [adestramento, adestrador, hotel pet, hotel para cachorro, creche canina, day care, dog walker, passeador], google_types: [pet_boarding_service, pet_care, veterinary_care], included_type: pet_boarding_service, osm: ['["amenity"="animal_boarding"]', '["amenity"="animal_training"]'], cta: "Consultar vagas", default_offer: landing, template: landing}
+  - {key: aquarismo, sector: pet, label: "Aquarismo e aves", plural: "lojas de aquarismo", term: "loja de aquário", aliases: [aquarismo, aquario, peixes ornamentais, casa de racao, agropecuaria], google_types: [pet_store, store], osm: ['["shop"="pet"]["name"~"aqua|ração|racao|agro",i]'], default_offer: catalogo, template: landing}
+
+  # ---------------------------------------------------------------- Automotivo
+  - key: oficina
+    sector: automotivo
+    label: "Oficina mecânica"
+    plural: "oficinas mecânicas"
+    term: "oficina mecânica"
+    aliases: [oficina, oficina mecanica, mecanica, mecanico, auto center, centro automotivo]
+    google_types: [car_repair, car_wash, auto_parts_store, car_dealer, tire_shop]
+    included_type: car_repair
+    osm: ['["shop"="car_repair"]']
+    tagline: "Revisão e conserto com orçamento claro e sem surpresa."
+    wa_message: "Olá! Vi o site da {name} e quero um orçamento."
+    services:
+      - ["🔧", "Mecânica geral", "Motor, suspensão, freios e embreagem."]
+      - ["🛢️", "Revisão e troca de óleo", "Revisão preventiva com checklist."]
+      - ["⚡", "Elétrica", "Diagnóstico eletrônico, bateria e injeção."]
+  - {key: auto_eletrica, sector: automotivo, label: "Auto elétrica", plural: "auto elétricas", term: "auto elétrica", aliases: [auto eletrica, autoeletrica, eletrica automotiva, bateria, som automotivo], google_types: [car_repair, auto_parts_store, electronics_store], osm: ['["shop"="car_repair"]["name"~"el[eé]tric|bateria",i]']}
+  - {key: funilaria, sector: automotivo, label: "Funilaria e pintura", plural: "funilarias", term: "funilaria e pintura", aliases: [funilaria, lanternagem, pintura automotiva, martelinho de ouro, martelinho], google_types: [car_repair], osm: ['["shop"="car_repair"]["name"~"funil|lantern|pintura|martelinho",i]']}
+  - {key: lava_jato, sector: automotivo, label: "Lava-jato e estética automotiva", plural: "lava-jatos", term: "lava jato", aliases: [lava jato, lavajato, lava rapido, estetica automotiva, polimento, vitrificacao, higienizacao automotiva], google_types: [car_wash, car_repair], included_type: car_wash, osm: ['["amenity"="car_wash"]'], cta: "Agendar lavagem", default_offer: agendamento, template: agendamento}
+  - {key: borracharia, sector: automotivo, label: "Borracharia", plural: "borracharias", term: "borracharia", aliases: [borracharia, borracheiro, pneus, pneu, alinhamento e balanceamento], google_types: [tire_shop, car_repair, auto_parts_store], included_type: tire_shop, osm: ['["shop"="tyres"]']}
+  - {key: autopecas, sector: automotivo, label: "Autopeças", plural: "lojas de autopeças", term: "autopeças", aliases: [autopecas, auto pecas, pecas automotivas, acessorios automotivos], google_types: [auto_parts_store, car_repair, store], included_type: auto_parts_store, osm: ['["shop"="car_parts"]'], default_offer: catalogo, cta: "Consultar peça pelo WhatsApp"}
+  - {key: moto, sector: automotivo, label: "Oficina de motos", plural: "oficinas de motos", term: "oficina de motos", aliases: [oficina de motos, moto, motos, motopecas, moto pecas], google_types: [car_repair, auto_parts_store, store], osm: ['["shop"~"motorcycle|motorcycle_repair"]']}
+  - {key: insulfilm, sector: automotivo, label: "Insulfilm e som", plural: "lojas de insulfilm e som", term: "insulfilm", aliases: [insulfilm, pelicula automotiva, envelopamento], google_types: [car_repair, auto_parts_store, electronics_store], osm: ['["name"~"insulfilm|película|pelicula|envelop",i]']}
+  - {key: guincho, sector: automotivo, label: "Guincho e reboque", plural: "serviços de guincho", term: "guincho", aliases: [guincho, reboque, socorro mecanico], google_types: [], osm: ['["name"~"guincho|reboque",i]']}
+  - {key: revenda_veiculos, sector: automotivo, label: "Revenda de veículos", plural: "revendas de veículos", term: "seminovos", aliases: [revenda de veiculos, seminovos, carros usados, loja de carros, concessionaria], google_types: [car_dealer, truck_dealer], included_type: car_dealer, osm: ['["shop"="car"]'], default_offer: catalogo, cta: "Ver estoque pelo WhatsApp"}
+  - {key: locadora, sector: automotivo, label: "Locadora de veículos", plural: "locadoras", term: "aluguel de carros", aliases: [locadora, aluguel de carros, locacao de veiculos], google_types: [car_rental], included_type: car_rental, osm: ['["amenity"="car_rental"]'], cta: "Consultar disponibilidade"}
+
+  # ---------------------------------------------------------------- Casa e construção
+  - {key: material_construcao, sector: casa, label: "Material de construção", plural: "lojas de material de construção", term: "material de construção", aliases: [material de construcao, materiais de construcao, deposito de construcao, casa de material], google_types: [building_materials_store, hardware_store, home_improvement_store, store], included_type: building_materials_store, osm: ['["shop"~"doityourself|hardware|trade"]'], default_offer: catalogo, cta: "Pedir cotação"}
+  - {key: vidracaria, sector: casa, label: "Vidraçaria", plural: "vidraçarias", term: "vidraçaria", aliases: [vidracaria, vidraceiro, box de banheiro, espelhos, vidros temperados], google_types: [store, home_improvement_store], osm: ['["craft"="glaziery"]', '["shop"="glaziery"]', '["name"~"vidra",i]']}
+  - {key: marmoraria, sector: casa, label: "Marmoraria", plural: "marmorarias", term: "marmoraria", aliases: [marmoraria, marmore, granito, bancadas], google_types: [store, home_improvement_store, manufacturer], osm: ['["craft"="stonemason"]', '["name"~"marmor",i]']}
+  - {key: serralheria, sector: casa, label: "Serralheria", plural: "serralherias", term: "serralheria", aliases: [serralheria, serralheiro, portoes, grades, estruturas metalicas], google_types: [], osm: ['["craft"~"metal_construction|blacksmith"]', '["name"~"serralh",i]']}
+  - {key: marcenaria, sector: casa, label: "Marcenaria e móveis planejados", plural: "marcenarias", term: "móveis planejados", aliases: [marcenaria, marceneiro, moveis planejados, moveis sob medida, planejados], google_types: [furniture_store, store, manufacturer], osm: ['["craft"~"carpenter|joiner|cabinet_maker"]', '["name"~"marcen|planejados",i]'], default_offer: institucional, template: institucional}
+  - {key: eletricista, sector: casa, label: "Eletricista", plural: "eletricistas", term: "eletricista", aliases: [eletricista, instalacao eletrica, eletrica residencial], google_types: [electrician], included_type: electrician, osm: ['["craft"="electrician"]']}
+  - {key: encanador, sector: casa, label: "Encanador e desentupidora", plural: "encanadores", term: "encanador", aliases: [encanador, bombeiro hidraulico, desentupidora, caca vazamento, hidraulica], google_types: [plumber], included_type: plumber, osm: ['["craft"="plumber"]']}
+  - {key: dedetizacao, sector: casa, label: "Dedetização", plural: "dedetizadoras", term: "dedetização", aliases: [dedetizacao, dedetizadora, controle de pragas, descupinizacao, desratizacao], google_types: [], osm: ['["craft"="pest_control"]', '["name"~"dedetiz|pragas",i]']}
+  - {key: chaveiro, sector: casa, label: "Chaveiro", plural: "chaveiros", term: "chaveiro", aliases: [chaveiro, chaves, chaveiro 24 horas, copia de chave], google_types: [locksmith], included_type: locksmith, osm: ['["craft"~"key_cutter|locksmith"]', '["shop"="locksmith"]']}
+  - {key: assistencia_tecnica, sector: casa, label: "Assistência técnica (celular e eletro)", plural: "assistências técnicas", term: "assistência técnica", aliases: [assistencia tecnica, conserto de celular, conserto de eletrodomesticos, conserto de geladeira, conserto de maquina de lavar, conserto de tv, conserto de notebook, informatica], google_types: [cell_phone_store, electronics_store, store], osm: ['["craft"~"electronics_repair"]', '["shop"~"mobile_phone|computer|electronics"]["name"~"assist|conserto|reparo",i]']}
+  - {key: ar_condicionado, sector: casa, label: "Ar-condicionado e refrigeração", plural: "empresas de ar-condicionado", term: "instalação de ar-condicionado", aliases: [ar condicionado, refrigeracao, climatizacao, instalacao de ar condicionado], google_types: [], osm: ['["craft"="hvac"]', '["name"~"refriger|climatiz|ar condicionado",i]']}
+  - {key: pintor, sector: casa, label: "Pintor e reformas", plural: "empresas de pintura e reforma", term: "pintor", aliases: [pintor, pintura residencial, reformas, reforma, pedreiro, empreiteira, gesso, drywall], google_types: [painter, general_contractor, roofing_contractor], included_type: painter, osm: ['["craft"~"painter|builder|plasterer"]']}
+  - {key: jardinagem, sector: casa, label: "Jardinagem e paisagismo", plural: "empresas de jardinagem", term: "jardinagem", aliases: [jardinagem, jardineiro, paisagismo, paisagista, gramas], google_types: [garden_center], osm: ['["craft"="gardener"]', '["shop"="garden_centre"]']}
+  - {key: limpeza, sector: casa, label: "Limpeza e diaristas", plural: "empresas de limpeza", term: "limpeza residencial", aliases: [limpeza, diarista, faxina, limpeza pos obra, limpeza de sofa, higienizacao de estofados], google_types: [], osm: ['["name"~"limpeza|higieniza",i]']}
+  - {key: lavanderia, sector: casa, label: "Lavanderia", plural: "lavanderias", term: "lavanderia", aliases: [lavanderia, lava e seca, tinturaria, passadoria], google_types: [laundry], included_type: laundry, osm: ['["shop"~"laundry|dry_cleaning"]']}
+  - {key: mudancas, sector: casa, label: "Mudanças e fretes", plural: "empresas de mudança", term: "mudanças", aliases: [mudancas, mudanca, frete, fretes, carreto, guarda moveis], google_types: [moving_company, storage], included_type: moving_company, osm: ['["office"="moving_company"]', '["name"~"mudan|frete",i]']}
+  - {key: energia_solar, sector: casa, label: "Energia solar", plural: "empresas de energia solar", term: "energia solar", aliases: [energia solar, placa solar, fotovoltaica], google_types: [], osm: ['["name"~"solar",i]'], default_offer: institucional, template: institucional}
+  - {key: seguranca, sector: casa, label: "Segurança eletrônica", plural: "empresas de segurança eletrônica", term: "câmeras de segurança", aliases: [seguranca eletronica, cameras de seguranca, cftv, alarmes, cerca eletrica, portao eletronico, interfone], google_types: [], osm: ['["name"~"segurança eletr|cftv|alarme",i]']}
+  - {key: piscinas, sector: casa, label: "Piscinas", plural: "lojas de piscinas", term: "piscinas", aliases: [piscinas, piscina, limpeza de piscina, piscineiro], google_types: [], osm: ['["shop"="swimming_pool"]', '["name"~"piscina",i]']}
+  - {key: toldos, sector: casa, label: "Toldos, cortinas e persianas", plural: "lojas de toldos e persianas", term: "persianas", aliases: [toldos, toldo, cortinas, persianas, persiana, coberturas], google_types: [home_goods_store, store], osm: ['["shop"~"curtain|window_blind"]', '["name"~"toldo|persiana|cortina",i]']}
+
+  # ---------------------------------------------------------------- Fitness e esportes
+  - key: academia
+    sector: fitness
+    label: "Academia"
+    plural: "academias"
+    term: "academia"
+    aliases: [academia, musculacao, studio de treino, personal, personal trainer]
+    google_types: [gym, fitness_center, sports_club, sports_complex, yoga_studio]
+    included_type: gym
+    osm: ['["leisure"="fitness_centre"]']
+    wa_message: "Olá! Vi o site da {name} e quero agendar uma aula experimental."
+    services:
+      - ["🏋️", "Musculação", "Treino montado e acompanhado por profissionais."]
+      - ["🤸", "Aulas coletivas", "Funcional, dança e alongamento."]
+      - ["📋", "Avaliação física", "Ponto de partida para o seu plano."]
+  - {key: pilates, sector: fitness, label: "Pilates", plural: "estúdios de pilates", term: "pilates", aliases: [pilates, studio de pilates, estudio de pilates], google_types: [gym, fitness_center, yoga_studio, physiotherapist, wellness_center, sports_club], osm: ['["leisure"="fitness_centre"]["name"~"pilates",i]', '["sport"="pilates"]'], default_offer: agendamento}
+  - {key: crossfit, sector: fitness, label: "Crossfit e funcional", plural: "boxes de crossfit e funcional", term: "crossfit", aliases: [crossfit, cross training, funcional, treino funcional, box], google_types: [gym, fitness_center, sports_club, sports_complex], osm: ['["leisure"="fitness_centre"]["name"~"cross|funcional",i]', '["sport"="crossfit"]']}
+  - {key: artes_marciais, sector: fitness, label: "Artes marciais", plural: "academias de artes marciais", term: "jiu-jitsu", aliases: [artes marciais, jiu jitsu, jiujitsu, muay thai, karate, judo, boxe, taekwondo, capoeira, lutas], google_types: [gym, fitness_center, sports_club, sports_school, sports_coaching, sports_complex], osm: ['["sport"~"martial_arts|karate|judo|boxing|taekwondo|jiu_jitsu|capoeira"]', '["leisure"="fitness_centre"]["name"~"jiu|muay|karat|jud[oô]|boxe|luta",i]']}
+  - {key: danca, sector: fitness, label: "Escola de dança", plural: "escolas de dança", term: "aulas de dança", aliases: [escola de danca, danca, ballet, bale, zumba, forro, danca de salao], google_types: [dance_hall, sports_school, school, gym, fitness_center], osm: ['["leisure"="dance"]', '["amenity"="dancing_school"]'], cta: "Agendar aula experimental"}
+  - {key: natacao, sector: fitness, label: "Natação e hidroginástica", plural: "escolas de natação", term: "natação", aliases: [natacao, hidroginastica, escola de natacao], google_types: [swimming_pool, sports_school, sports_club, sports_complex, gym], osm: ['["sport"="swimming"]["name"]', '["leisure"="swimming_pool"]["name"~"nata|academia|escola",i]']}
+  - {key: quadras, sector: fitness, label: "Quadras e escolinhas", plural: "quadras e escolinhas esportivas", term: "escolinha de futebol", aliases: [escolinha de futebol, quadra, society, beach tennis, futevolei, tenis, volei, escolinha], google_types: [sports_complex, sports_club, athletic_field, sports_school, sports_coaching, tennis_court, sports_activity_location], osm: ['["leisure"="sports_centre"]', '["leisure"="pitch"]["name"]'], cta: "Reservar horário", default_offer: agendamento}
+  - {key: loja_esportes, sector: fitness, label: "Loja de suplementos e esportes", plural: "lojas de suplementos", term: "suplementos", aliases: [suplementos, loja de suplementos, artigos esportivos, bicicletaria, bike, bicicletas], google_types: [sporting_goods_store, sportswear_store, bicycle_store, health_food_store, store], osm: ['["shop"~"sports|nutrition_supplements|bicycle"]'], default_offer: catalogo, template: landing, cta: "Ver produtos pelo WhatsApp"}
+
+  # ---------------------------------------------------------------- Educação
+  - {key: idiomas, sector: educacao, label: "Escola de idiomas", plural: "escolas de idiomas", term: "curso de inglês", aliases: [escola de idiomas, idiomas, curso de ingles, ingles, espanhol, aulas de ingles], google_types: [school, educational_institution], osm: ['["amenity"="language_school"]']}
+  - {key: reforco, sector: educacao, label: "Reforço escolar", plural: "espaços de reforço escolar", term: "reforço escolar", aliases: [reforco escolar, reforco, aula particular, aulas particulares, kumon, professor particular], google_types: [school, educational_institution], osm: ['["amenity"~"prep_school|tutor"]', '["office"="tutoring"]', '["name"~"reforço|reforco|kumon",i]']}
+  - {key: autoescola, sector: educacao, label: "Autoescola", plural: "autoescolas", term: "autoescola", aliases: [autoescola, auto escola, cfc, centro de formacao de condutores, habilitacao], google_types: [school, educational_institution], osm: ['["amenity"="driving_school"]'], cta: "Consultar valores"}
+  - {key: escola_infantil, sector: educacao, label: "Escola infantil e berçário", plural: "escolas infantis", term: "escola infantil", aliases: [escola infantil, bercario, creche, educacao infantil, maternal, escolinha infantil], google_types: [preschool, primary_school, school, child_care_agency, educational_institution], included_type: preschool, osm: ['["amenity"~"kindergarten|childcare"]'], cta: "Agendar visita", default_offer: institucional, template: institucional}
+  - {key: cursos_livres, sector: educacao, label: "Cursos livres e profissionalizantes", plural: "escolas de cursos", term: "cursos profissionalizantes", aliases: [cursos livres, cursos, curso profissionalizante, cursos profissionalizantes, curso de informatica, curso tecnico, preparatorio, pre vestibular, cursinho], google_types: [school, educational_institution, university], osm: ['["amenity"~"college|training"]']}
+  - {key: musica, sector: educacao, label: "Escola de música", plural: "escolas de música", term: "aulas de música", aliases: [escola de musica, aulas de musica, aula de violao, aula de piano, aula de canto, musicalizacao], google_types: [school, educational_institution], osm: ['["amenity"="music_school"]']}
+  - {key: escola, sector: educacao, label: "Colégio e escola particular", plural: "escolas particulares", term: "escola particular", aliases: [colegio, escola particular, ensino fundamental, ensino medio], google_types: [school, primary_school, secondary_school, educational_institution], included_type: school, osm: ['["amenity"="school"]["operator:type"="private"]', '["amenity"="school"]["name"~"col[eé]gio",i]'], default_offer: institucional, template: institucional, cta: "Agendar visita"}
+
+  # ---------------------------------------------------------------- Serviços profissionais
+  - {key: advocacia, sector: profissionais, label: "Advocacia", plural: "escritórios de advocacia", term: "advogado", aliases: [advocacia, advogado, advogada, escritorio de advocacia, advogado trabalhista, advogado previdenciario], google_types: [lawyer], included_type: lawyer, osm: ['["office"="lawyer"]'], cta: "Falar com um advogado"}
+  - {key: contabilidade, sector: profissionais, label: "Contabilidade", plural: "escritórios de contabilidade", term: "contador", aliases: [contabilidade, contador, contadora, escritorio contabil, abertura de empresa, mei], google_types: [accounting, finance], included_type: accounting, osm: ['["office"~"accountant|tax_advisor"]'], cta: "Falar com um contador"}
+  - {key: imobiliaria, sector: profissionais, label: "Imobiliária", plural: "imobiliárias", term: "imobiliária", aliases: [imobiliaria, corretor de imoveis, corretora de imoveis, imoveis, aluguel de imoveis], google_types: [real_estate_agency], included_type: real_estate_agency, osm: ['["office"="estate_agent"]'], cta: "Ver imóveis pelo WhatsApp"}
+  - {key: despachante, sector: profissionais, label: "Despachante", plural: "despachantes", term: "despachante", aliases: [despachante, despachante documentalista, transferencia de veiculo, emplacamento, licenciamento], google_types: [], osm: ['["name"~"despachante",i]'], default_offer: landing, template: landing, cta: "Consultar valores"}
+  - {key: arquitetura, sector: profissionais, label: "Arquitetura e interiores", plural: "escritórios de arquitetura", term: "arquiteto", aliases: [arquitetura, arquiteto, arquiteta, design de interiores, interiores, decoracao], google_types: [], osm: ['["office"="architect"]'], cta: "Pedir orçamento do projeto"}
+  - {key: seguros, sector: profissionais, label: "Corretora de seguros", plural: "corretoras de seguros", term: "corretor de seguros", aliases: [seguros, corretora de seguros, corretor de seguros, plano de saude, consorcio], google_types: [insurance_agency, finance], included_type: insurance_agency, osm: ['["office"="insurance"]'], cta: "Fazer cotação", default_offer: landing, template: landing}
+  - {key: engenharia, sector: profissionais, label: "Engenharia e laudos", plural: "escritórios de engenharia", term: "engenheiro civil", aliases: [engenharia, engenheiro, engenheiro civil, laudo tecnico, topografia], google_types: [consultant], osm: ['["office"="engineer"]']}
+  - {key: marketing, sector: profissionais, label: "Gráfica e comunicação visual", plural: "gráficas", term: "gráfica", aliases: [grafica, comunicacao visual, impressao, banner, adesivos, placas, letreiro], google_types: [store, marketing_consultant], osm: ['["shop"="copyshop"]', '["craft"~"printer|signmaker"]'], default_offer: catalogo, template: landing, cta: "Pedir orçamento"}
+  - {key: coworking, sector: profissionais, label: "Coworking", plural: "coworkings", term: "coworking", aliases: [coworking, escritorio compartilhado, sala comercial], google_types: [coworking_space, business_center], included_type: coworking_space, osm: ['["amenity"="coworking_space"]', '["office"="coworking"]'], cta: "Agendar visita", default_offer: landing, template: landing}
+  - {key: turismo, sector: profissionais, label: "Agência de viagens", plural: "agências de viagens", term: "agência de viagens", aliases: [agencia de viagens, agencia de turismo, viagens, turismo, excursoes], google_types: [travel_agency, tour_agency], included_type: travel_agency, osm: ['["shop"="travel_agency"]'], cta: "Pedir roteiro", default_offer: landing, template: landing}
+  - {key: funeraria, sector: profissionais, label: "Funerária", plural: "funerárias", term: "funerária", aliases: [funeraria, plano funerario], google_types: [funeral_home], included_type: funeral_home, osm: ['["shop"="funeral_directors"]'], cta: "Falar agora"}
+
+  # ---------------------------------------------------------------- Comércio local
+  - {key: loja_roupas, sector: comercio, label: "Loja de roupas", plural: "lojas de roupas", term: "loja de roupas", aliases: [loja de roupas, roupas, boutique, moda feminina, moda masculina, moda infantil, brecho, moda praia, lingerie], google_types: [clothing_store, womens_clothing_store, thrift_store, shoe_store, store], included_type: clothing_store, osm: ['["shop"~"clothes|boutique|second_hand"]']}
+  - {key: floricultura, sector: comercio, label: "Floricultura", plural: "floriculturas", term: "floricultura", aliases: [floricultura, flores, buques, buque, cestas, arranjos], google_types: [florist, garden_center, store], included_type: florist, osm: ['["shop"="florist"]'], cta: "Encomendar pelo WhatsApp"}
+  - {key: papelaria, sector: comercio, label: "Papelaria", plural: "papelarias", term: "papelaria", aliases: [papelaria, material escolar, livraria, xerox, personalizados], google_types: [book_store, store, gift_shop], osm: ['["shop"~"stationery|books"]']}
+  - {key: loja_celulares, sector: comercio, label: "Loja de celulares", plural: "lojas de celulares", term: "loja de celulares", aliases: [loja de celulares, celulares, capinhas, acessorios para celular, iphone], google_types: [cell_phone_store, electronics_store, store], included_type: cell_phone_store, osm: ['["shop"="mobile_phone"]']}
+  - {key: joalheria, sector: comercio, label: "Joalheria e semijoias", plural: "joalherias", term: "joalheria", aliases: [joalheria, joias, semijoias, relojoaria, aliancas, bijuterias], google_types: [jewelry_store, store], included_type: jewelry_store, osm: ['["shop"~"jewelry|watches"]']}
+  - {key: loja_moveis, sector: comercio, label: "Loja de móveis", plural: "lojas de móveis", term: "loja de móveis", aliases: [loja de moveis, moveis, colchoes, estofados, decoracao para casa], google_types: [furniture_store, home_goods_store, store], included_type: furniture_store, osm: ['["shop"~"furniture|bed|interior_decoration"]']}
+  - {key: calcados, sector: comercio, label: "Loja de calçados", plural: "lojas de calçados", term: "loja de calçados", aliases: [loja de calcados, calcados, sapatos, sapataria, tenis loja], google_types: [shoe_store, clothing_store, store], included_type: shoe_store, osm: ['["shop"="shoes"]']}
+  - {key: cosmeticos, sector: comercio, label: "Perfumaria e cosméticos", plural: "perfumarias", term: "perfumaria", aliases: [perfumaria, cosmeticos, loja de cosmeticos, perfumes], google_types: [cosmetics_store, store, beauty_salon], included_type: cosmetics_store, osm: ['["shop"~"cosmetics|perfumery"]']}
+  - {key: presentes, sector: comercio, label: "Presentes e brinquedos", plural: "lojas de presentes", term: "loja de presentes", aliases: [loja de presentes, presentes, brinquedos, loja de brinquedos, artesanato, utilidades], google_types: [gift_shop, toy_store, home_goods_store, store], included_type: gift_shop, osm: ['["shop"~"gift|toys|craft"]']}
+  - {key: bebidas, sector: comercio, label: "Adega e distribuidora", plural: "adegas e distribuidoras", term: "distribuidora de bebidas", aliases: [adega, distribuidora de bebidas, distribuidora, disk bebidas, deposito de bebidas, gas e agua, deposito de gas], google_types: [liquor_store, store, convenience_store], included_type: liquor_store, osm: ['["shop"~"alcohol|beverages|wine"]'], cta: "Pedir pelo WhatsApp"}
+  - {key: eletronicos, sector: comercio, label: "Eletrônicos e informática", plural: "lojas de eletrônicos", term: "loja de informática", aliases: [loja de informatica, eletronicos, computadores, games, loja de games], google_types: [electronics_store, store], included_type: electronics_store, osm: ['["shop"~"computer|electronics|video_games"]']}
+  - {key: tecidos, sector: comercio, label: "Tecidos, aviamentos e costura", plural: "ateliês de costura", term: "costureira", aliases: [costureira, atelie de costura, ajustes de roupa, tecidos, aviamentos, alfaiate], google_types: [tailor, store], included_type: tailor, osm: ['["craft"~"tailor|dressmaker"]', '["shop"~"fabric|sewing|tailor"]'], default_offer: landing}
+
+  # ---------------------------------------------------------------- Eventos e hospedagem
+  - {key: buffet, sector: eventos, label: "Buffet", plural: "buffets", term: "buffet", aliases: [buffet, bufe, buffet infantil, catering, salgados para festa, churrasqueiro], google_types: [catering_service, banquet_hall, event_venue, food], included_type: catering_service, osm: ['["craft"="caterer"]', '["name"~"buffet",i]'], cta: "Pedir orçamento"}
+  - {key: salao_festas, sector: eventos, label: "Salão de festas", plural: "salões de festas", term: "salão de festas", aliases: [salao de festas, espaco de eventos, casa de festas, sitio para eventos, chacara para eventos], google_types: [event_venue, banquet_hall, wedding_venue], included_type: event_venue, osm: ['["amenity"="events_venue"]']}
+  - {key: fotografo, sector: eventos, label: "Fotógrafo", plural: "fotógrafos", term: "fotógrafo", aliases: [fotografo, fotografa, fotografia, estudio fotografico, ensaio fotografico, filmagem, videomaker], google_types: [], osm: ['["craft"="photographer"]', '["shop"="photo"]'], cta: "Consultar data", default_offer: institucional}
+  - {key: pousada, sector: eventos, label: "Pousada", plural: "pousadas", term: "pousada", aliases: [pousada, hospedagem, hostel, chale, chales, hotel fazenda], google_types: [lodging, guest_house, bed_and_breakfast, inn, hotel, hostel, cottage, farmstay], included_type: lodging, osm: ['["tourism"~"guest_house|hostel|chalet"]'], cta: "Reservar pelo WhatsApp", wa_message: "Olá! Vi o site de vocês ({name}) e quero consultar uma reserva."}
+  - {key: decoracao_festas, sector: eventos, label: "Decoração e locação para festas", plural: "decoradores de festas", term: "decoração de festas", aliases: [decoracao de festas, decoracao de festa, aluguel de brinquedos, pula pula, locacao para festas, baloes, pegue e monte], google_types: [], osm: ['["shop"="party"]', '["name"~"festas|balões|baloes",i]'], default_offer: landing}
+  - {key: dj_som, sector: eventos, label: "DJ, som e iluminação", plural: "serviços de som para eventos", term: "dj para festa", aliases: [dj, som e iluminacao, banda para casamento, musica para eventos], google_types: [], osm: ['["name"~"\\bdj\\b|sonoriza",i]'], default_offer: landing}
+  - {key: cerimonial, sector: eventos, label: "Cerimonial e assessoria", plural: "cerimonialistas", term: "cerimonialista", aliases: [cerimonial, cerimonialista, assessoria de casamento, assessoria de eventos, convites], google_types: [], osm: ['["name"~"cerimonial",i]']}
+  - {key: hotel, sector: eventos, label: "Hotel", plural: "hotéis", term: "hotel", aliases: [hotel, hoteis, motel, flat], google_types: [hotel, lodging, motel, resort_hotel, extended_stay_hotel], included_type: hotel, osm: ['["tourism"~"hotel|motel"]'], cta: "Reservar pelo WhatsApp"}
+
+  # ---------------------------------------------------------------- Outro (genérico)
+  - {key: outro, sector: outros, label: "Outro", plural: "negócios locais", term: "", aliases: [], google_types: [], osm: []}

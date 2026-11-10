@@ -1,0 +1,17 @@
+# docker compose up --build  ->  http://localhost:8000
+# Fictícios de demonstração: docker compose run --rm app python -m app.seed
+services:
+  app:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"   # só na máquina local
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: sqlite:////app/data/radar.db
+      PREVIEWS_DIR: /app/data/previews
+      BACKUPS_DIR: /app/data/backups
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped

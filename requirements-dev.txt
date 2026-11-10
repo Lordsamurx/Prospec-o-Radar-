@@ -1,0 +1,4 @@
+-r requirements.txt
+pytest==9.2.0
+# Só para os testes no navegador (python scripts/dev.py e2e):
+#   pip install playwright && python -m playwright install chromium
