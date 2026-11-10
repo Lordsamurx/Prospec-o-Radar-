@@ -1,4 +1,6 @@
 # docker compose up --build  ->  http://localhost:8000
+# O banco fica na pasta de RADAR_DATA_DIR (no .env). Sem ela, em ./data.
+# No Windows, deixe fora do OneDrive: RADAR_DATA_DIR=C:/dev/prospeccao-data
 # Fictícios de demonstração: docker compose run --rm app python -m app.seed
 services:
   app:
@@ -13,5 +15,5 @@ services:
       PREVIEWS_DIR: /app/data/previews
       BACKUPS_DIR: /app/data/backups
     volumes:
-      - ./data:/app/data
+      - ${RADAR_DATA_DIR:-./data}:/app/data
     restart: unless-stopped
